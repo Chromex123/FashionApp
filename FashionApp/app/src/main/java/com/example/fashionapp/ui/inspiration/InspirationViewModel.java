@@ -10,7 +10,6 @@ public class InspirationViewModel extends ViewModel {
 
     public InspirationViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Get fit inspiration from others!");
     }
 
     public LiveData<String> getText() {

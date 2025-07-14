@@ -33,7 +33,7 @@
         android:layout_margin="6dp"
         android:visibility="gone"
         android:src="@drawable/ic_check_circle"
-        app:tint="#CCCCCC" />
+         />
 
 
 </FrameLayout>

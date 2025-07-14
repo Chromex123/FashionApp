@@ -1,6 +1,7 @@
 package com.example.fashionapp.ui.home;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -217,30 +218,42 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
         deleteButton.setOnClickListener(v -> {
             List<Uri> selectedUris = recycleAdapter.getSelectedUris();
 
-            if (selectedUris.isEmpty()) return;
-
-            // 1. Remove selected images from imageUris
-            recyclingArrayList.removeAll(selectedUris);
-            Log.i("HomeFragment", selectedUris.size() + " images deleted");
-
-            // 2. Save updated imageUris to SharedPreferences
-            saveImageUrisToPreferences(recyclingArrayList);
-
-            // 3. Update adapter
-            recycleAdapter.setImageUris(recyclingArrayList);
-            recycleAdapter.clearSelection();
-            recycleAdapter.notifyDataSetChanged();
-
-            // 4. Hide selection UI and badge
-            hideBottomActionBar();
-            isInSelectionMode = false;
-            if (badge != null) {
-                badge.setVisibility(View.GONE);
-                badge.setText(1 + " selected");
+            if (selectedUris.isEmpty()) {
+                return;
             }
 
-            // Make add button visible again
-            toggleAddPhotoButton(true);
+            new AlertDialog.Builder(requireContext())
+                .setTitle("Delete selected images?")
+                .setMessage("This action cannot be undone.")
+                .setPositiveButton("Delete", (dialog, which) -> {
+
+                    // 1. Remove selected images from imageUris
+                    recyclingArrayList.removeAll(selectedUris);
+                    Log.i("HomeFragment", selectedUris.size() + " images deleted");
+
+                    // 2. Save updated imageUris to SharedPreferences
+                    saveImageUrisToPreferences(recyclingArrayList);
+
+                    // 3. Update adapter
+                    recycleAdapter.setImageUris(recyclingArrayList);
+                    recycleAdapter.clearSelection();
+                    recycleAdapter.notifyDataSetChanged();
+
+                    // 4. Hide selection UI and badge
+                    hideBottomActionBar();
+                    isInSelectionMode = false;
+                    if (badge != null) {
+                        badge.setVisibility(View.GONE);
+                        badge.setText(1 + " selected");
+                    }
+
+                    // Make add button visible again
+                    toggleAddPhotoButton(true);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss(); // Just close the dialog
+                })
+                .show();
 
         });
 

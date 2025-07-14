@@ -4,19 +4,145 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.inspiration.InspirationFragment">
+    tools:context=".ui.inspiration.InspirationFragment"
+    android:background="@color/bg_color">
 
-    <TextView
-        android:id="@+id/text_inspiration"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/filter_feed_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:background="@color/bar_color"
+        android:elevation="8dp"
+        android:visibility="visible"
+        android:gravity="start"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Left-aligned Button -->
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/inspiration_search_bar"
+            android:drawableStart="@drawable/ic_inspiration_search"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/light_gray"
+            android:hint="Search"
+            android:importantForAutofill="no"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@android:color/white"
+            android:textColorHint="@color/light_gray"
+            android:singleLine="true"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/right_filter_group"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- Right-aligned Button Group -->
+        <LinearLayout
+            android:id="@+id/right_filter_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Styles Button -->
+            <LinearLayout
+                android:id="@+id/filter_feed_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="Styles"
+                    android:textColor="@color/teal_200"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- New Button -->
+            <LinearLayout
+                android:id="@+id/new_feed_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="New"
+                    android:textColor="@color/light_gray"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Top Button -->
+            <LinearLayout
+                android:id="@+id/top_feed_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="Top"
+                    android:textColor="@color/light_gray"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageButton
+        android:id="@+id/newPostButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="168dp"
+        android:background="@null"
+        android:clickable="true"
+        android:contentDescription="New Post"
+        android:focusable="true"
+        android:src="@drawable/round_add_circle_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.85"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.975"
+        app:tint="@color/teal_200" />
 </androidx.constraintlayout.widget.ConstraintLayout>
