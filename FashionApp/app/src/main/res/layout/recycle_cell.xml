@@ -17,6 +17,12 @@
         android:src="@drawable/round_add_circle_24"
         />
 
+    <ProgressBar
+        android:id="@+id/image_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
     <View
         android:id="@+id/selection_overlay"
         android:layout_width="match_parent"

@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.fashionapp.databinding.FragmentInspirationBinding;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class InspirationFragment extends Fragment {
 

@@ -11,6 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.fashionapp.R;
 
 import java.util.Objects;
@@ -18,7 +19,7 @@ import java.util.Objects;
 public class HomeActivityDetail extends AppCompatActivity {
 
     private ImageView recycleImage;
-    Uri selectedRecycling;
+    String selectedRecycling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,8 @@ public class HomeActivityDetail extends AppCompatActivity {
         Intent prevIntent = getIntent();
         int position = prevIntent.getIntExtra("position", 0);
         selectedRecycling = HomeFragment.recyclingArrayList.get(position);
-        recycleImage.setImageURI(selectedRecycling);
+        Glide.with(this)
+                .load(selectedRecycling)
+                .into(recycleImage);
     }
 }
