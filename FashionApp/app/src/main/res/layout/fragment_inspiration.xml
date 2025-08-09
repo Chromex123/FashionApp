@@ -29,13 +29,13 @@
             android:background="@drawable/inspiration_search_bar"
             android:drawableStart="@drawable/ic_inspiration_search"
             android:drawablePadding="8dp"
-            android:drawableTint="@color/light_gray"
+            android:drawableTint="@color/white"
             android:hint="Search"
             android:importantForAutofill="no"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:textColor="@android:color/white"
-            android:textColorHint="@color/light_gray"
+            android:textColorHint="@color/white"
             android:singleLine="true"
             android:imeOptions="actionSearch"
             android:inputType="text"
@@ -153,5 +153,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.975"
-        app:tint="@color/teal_200" />
+        app:tint="@color/teal_700" />
 </androidx.constraintlayout.widget.ConstraintLayout>

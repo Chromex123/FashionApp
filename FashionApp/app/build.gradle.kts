@@ -63,4 +63,10 @@ dependencies {
     //Glide
     implementation(libs.github.glide)
     annotationProcessor(libs.compiler)
+
+    //Chip
+    implementation(libs.material.v1110)
+    implementation(libs.material3)
+    implementation(libs.material3.window.size.class1)
+    implementation(libs.material3.adaptive.navigation.suite)
 }

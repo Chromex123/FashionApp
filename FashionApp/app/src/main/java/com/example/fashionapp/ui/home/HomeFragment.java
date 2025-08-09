@@ -36,6 +36,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -124,7 +125,18 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
         });
 
         // Load current images saved in Firestore
-        loadGalleryImages();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            loadGalleryImages(); // safe to call
+        } else {
+            mAuth.signInAnonymously()
+                .addOnSuccessListener(authResult -> {
+                    loadGalleryImages();
+                })
+                .addOnFailureListener(e -> {
+                    Log.i("Firebase", "Anonymous sign-in failed", e);
+                });
+        }
         
         return root;
     }
@@ -166,7 +178,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
 
     private void saveImageUrlToFirestore(Uri imageUri) {
         String imageUrl = String.valueOf(Uri.parse(imageUri.toString()));
-        String uid = (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser())).getUid();
+        String uid = (Objects.requireNonNull(mAuth.getCurrentUser())).getUid();
         Log.i("Firebase", "Saved to firebase");
 
         Map<String, Object> newImage = new HashMap<>();
@@ -192,7 +204,8 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
     private void loadGalleryImages() {
         String uid = (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser())).getUid();
 
-        FirebaseFirestore.getInstance().collection("user_gallery")
+        FirebaseFirestore.getInstance()
+                .collection("user_gallery")
                 .document(uid)
                 .collection("images")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
