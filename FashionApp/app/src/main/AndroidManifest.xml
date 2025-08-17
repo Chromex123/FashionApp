@@ -20,6 +20,15 @@
         android:theme="@style/Theme.FashionApp"
         tools:targetApi="31">
         <activity
+            android:name=".ui.favorites.FavoritesActivityPostDetail"
+            android:exported="false" />
+        <activity
+            android:name=".ui.inspiration.InspirationActivityOutfitDetail"
+            android:exported="false" />
+        <activity
+            android:name=".ui.inspiration.InspirationActivityPostDetail"
+            android:exported="false" />
+        <activity
             android:name=".ui.inspiration.InspirationActivityOutfitSelect"
             android:exported="false" />
         <activity

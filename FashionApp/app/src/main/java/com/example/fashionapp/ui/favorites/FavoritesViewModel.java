@@ -10,7 +10,6 @@ public class FavoritesViewModel extends ViewModel {
 
     public FavoritesViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Fits that you favorite");
     }
 
     public LiveData<String> getText() {

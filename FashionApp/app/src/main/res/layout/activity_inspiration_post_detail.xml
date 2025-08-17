@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true"
+    android:padding="8dp"
+    tools:context=".ui.inspiration.InspirationActivityPostDetail">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/selectedPostImage"
+            android:layout_width="400dp"
+            android:layout_height="500dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/inspiration_default_image" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/selectedPostStyles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:flexWrap="wrap"
+            app:justifyContent="flex_start"
+            android:layout_below="@id/selectedPostImage">
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <TextView
+            android:id="@+id/selectedPostCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text=""
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:lineSpacingExtra="6dp"
+            android:layout_below="@id/selectedPostStyles"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height=".1dp"
+            android:background="@color/light_gray"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/selectedPostCaption"/>
+    </RelativeLayout>
+
+</ScrollView>

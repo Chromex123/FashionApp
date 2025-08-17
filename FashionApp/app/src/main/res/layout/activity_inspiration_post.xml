@@ -14,17 +14,34 @@ android:fillViewport="true">
 
         <!-- Post Title -->
         <EditText
-            android:id="@+id/postTitleEditText"
+            android:id="@+id/postTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="48dp"
             android:hint="Title"
             android:textSize="18sp"
+            android:textStyle="bold"
             android:padding="12dp"
             android:layout_marginBottom="12dp"
-            android:layout_marginTop="32dp"
-            android:maxLines="3"/>
+            android:layout_marginTop="8dp"
+            android:maxLines="2"
+            android:maxLength="100"/>
+
+        <!-- Caption -->
+        <EditText
+            android:id="@+id/postCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Describe the fit (ex: Pacsun Baggy Jeans $30)"
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:padding="12dp"
+            android:layout_marginBottom="4dp"
+            android:textSize="11sp"
+            android:lineSpacingExtra="6dp"
+            android:maxLines="4"
+            android:minHeight="48dp"/>
 
         <!-- Select Image Button -->
         <Button
@@ -39,45 +56,42 @@ android:fillViewport="true">
         <!-- Selected Image Preview -->
         <ImageView
             android:id="@+id/selectedImageView"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
             android:layout_gravity="center"
             android:background="#E0E0E0"
             android:contentDescription="Selected Image"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="3dp" />
 
-        <!-- Caption -->
-        <EditText
-            android:id="@+id/captionEditText"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Describe the outfit (ex: Shirt from Walmart $10)"
-            android:inputType="textMultiLine"
-            android:gravity="top"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
+            android:text="*Image will be enlarged in post*"
+            android:textStyle="italic"
+            android:textColor="@color/light_gray"
             android:textSize="11sp"
-            android:maxLines="4"
-            android:minHeight="48dp"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="2dp" />
 
         <!-- Tag Selection -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Select styles:"
-            android:textSize="10sp"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold"
+            android:textSize="11sp"
+            android:textColor="@color/light_gray"
+            android:layout_marginBottom="2dp" />
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="90dp"
+            android:layout_height="80dp"
             android:fillViewport="true">
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/tagChipGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="42dp"
                 app:singleSelection="false"
                 app:selectionRequired="false"
                 app:chipSpacing="8dp">
@@ -95,5 +109,12 @@ android:fillViewport="true">
             android:backgroundTint="?attr/colorPrimary"
             android:textColor="@android:color/white"
             android:layout_marginTop="24dp"/>
+
+        <View
+            android:id="@+id/snackbarAnchor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </View>
+
     </LinearLayout>
 </ScrollView>

@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,17 +35,30 @@ import com.example.fashionapp.RecycleAdapter;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class InspirationActivityPost extends AppCompatActivity {
-
-    private boolean outfitSelected = false;
+    private FirebaseAuth mAuth;
+    private String image = "";
     private Post newPost;
-    private final String[] styles = {"Casual", "Formal", "Streetwear", "Baggy", "Sporty", "Vintage",
-                                     "Chic", "Retro", "Old Money", "Business Casual"};
+    private long mLastClickTimePostButton = 0;
+    private final long mClickIntervalPostButton = 3000;
+    private long mLastClickTimeImageView = 0;
+    private final long mClickIntervalImageView = 1000;
+    private boolean outfitSelected = false;
+    public static final String[] styles = {"Men", "Women", "Casual", "Formal", "Streetwear", "Baggy",
+                                     "Sporty", "Vintage", "Chic", "Retro", "Old Money", "Business Casual"};
+    private final int maxTitleNewlines = 4;
+    private final int maxCaptionNewlines = 25;
+
     private ActivityResultLauncher<Intent> launcher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -56,14 +72,14 @@ public class InspirationActivityPost extends AppCompatActivity {
                                             .centerCrop()
                                             .into((ImageView) findViewById(R.id.selectedImageView));
                                     outfitSelected = false;
-                                    newPost.imageUrl = null;
+                                    image = "";
                                 }else{
                                     // Use Glide or whatever you want
                                     Glide.with(this).load(imageUrl)
                                             .centerCrop()
                                             .into((ImageView) findViewById(R.id.selectedImageView));
                                     outfitSelected = true;
-                                    newPost.imageUrl = imageUrl;
+                                    image = imageUrl;
                                 }
                             }
                         }
@@ -76,7 +92,6 @@ public class InspirationActivityPost extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Objects.requireNonNull(getSupportActionBar()).hide();
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_inspiration_post);
         /*
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -85,7 +100,7 @@ public class InspirationActivityPost extends AppCompatActivity {
             return insets;
         }); */
 
-        newPost = new Post();
+        mAuth = FirebaseAuth.getInstance();
 
         setupKeyboardDismissOnTouch(findViewById(android.R.id.content).getRootView());
 
@@ -99,40 +114,42 @@ public class InspirationActivityPost extends AppCompatActivity {
             }
         });
 
+        ImageView selectedImageView = findViewById(R.id.selectedImageView);
+        selectedImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSelectedImageViewClick(v);
+            }
+        });
+
         ChipGroup chipGroup = findViewById(R.id.tagChipGroup);
         for (String tag : styles) {
             Chip chip = new Chip(this);
 
             chip.setText(tag);
-            chip.setCheckable(true);                // must be checkable for toggle
-            chip.setClickable(true);                // clickable to receive taps
-            chip.setCheckedIconVisible(true);      // show icon only when checked
+            chip.setCheckable(true);
+            chip.setClickable(true);
+            chip.setCheckedIconVisible(true);
 
             chipGroup.addView(chip);
         }
 
-        // Optional: listen for selection changes
+        //Listen for selection changes
         chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
             List<String> selectedTags = new ArrayList<>();
             for (int id : checkedIds) {
                 Chip selectedChip = group.findViewById(id);
                 selectedTags.add(selectedChip.getText().toString());
             }
-            Log.i("InspirationActivityPost", "Current styles: " + selectedTags);
+            //Log.i("InspirationActivityPost", "Current styles: " + selectedTags);
         });
 
         Button submitPostButton = findViewById(R.id.submitPostButton);
-        // Get all selected tags when needed (e.g., on button click)
-        submitPostButton.setOnClickListener(v -> {
-            List<Integer> selectedIds = chipGroup.getCheckedChipIds();
-            List<String> selectedTags = new ArrayList<>();
-
-            for (int id : selectedIds) {
-                Chip chip = chipGroup.findViewById(id);
-                selectedTags.add(chip.getText().toString());
+        submitPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSubmitPostButtonClick(v);
             }
-
-            Log.i("InspirationActivityPost", "Styles: " + selectedTags);
         });
     }
 
@@ -141,6 +158,112 @@ public class InspirationActivityPost extends AppCompatActivity {
         ((Button) clicked).setEnabled(false);
         Intent intent = new Intent(getApplicationContext(), InspirationActivityOutfitSelect.class);
         launcher.launch(intent);
+    }
+
+    private void onSelectedImageViewClick(View clicked) {
+        Log.i("InspirationActivityPost","ImageView click");
+        //Prevent double tapping
+        if(SystemClock.elapsedRealtime() - mLastClickTimeImageView < mClickIntervalImageView) {
+            return;
+        }
+        mLastClickTimeImageView = SystemClock.elapsedRealtime();
+
+        Intent intent = new Intent(getApplicationContext(), InspirationActivityOutfitDetail.class);
+        intent.putExtra("imageUrl", image);
+        startActivity(intent);
+    }
+
+    private void onSubmitPostButtonClick(View clicked) {
+        boolean validPost = true;
+
+        //Prevent double tapping
+        if(SystemClock.elapsedRealtime() - mLastClickTimePostButton < mClickIntervalPostButton) {
+            return;
+        }
+        mLastClickTimePostButton = SystemClock.elapsedRealtime();
+
+        //Get post title
+        EditText titleEditText = findViewById(R.id.postTitle);
+        Editable titleEditable = titleEditText.getText();
+        String title = titleEditable.toString().trim();
+
+        //Ensure a image is selected and post title is not blank
+        if(title.isEmpty() || !outfitSelected) {
+            validPost = false;
+            Snackbar.make(findViewById(android.R.id.content).getRootView(),
+                    "Title blank or no image selected.", 3000)
+                    .setAnchorView(findViewById(R.id.snackbarAnchor)).
+                    show();
+        }else{
+            //Get post caption
+            EditText captionEditText = findViewById(R.id.postCaption);
+            Editable captionEditable = captionEditText.getText();
+            String caption = captionEditable.toString().trim();
+
+            // Get all selected tags
+            ChipGroup chipGroup = findViewById(R.id.tagChipGroup);
+            List<Integer> selectedIds = chipGroup.getCheckedChipIds();
+            List<String> selectedTags = new ArrayList<>();
+
+            for (int id : selectedIds) {
+                Chip chip = chipGroup.findViewById(id);
+                selectedTags.add(chip.getText().toString());
+            }
+
+            //Check for excessive newline characters in title and caption
+            char newline = '\n';
+            int countTitle = 0;
+            int countCaption = 0;
+
+            for (int i = 0; i < title.length(); i++) {
+                if (title.charAt(i) == newline) {
+                    countTitle++;
+                }
+            }
+            for (int i = 0; i < caption.length(); i++) {
+                if (caption.charAt(i) == newline) {
+                    countCaption++;
+                }
+            }
+
+            if(countTitle >= maxTitleNewlines || countCaption >= maxCaptionNewlines) {
+                validPost = false;
+                Snackbar.make(findViewById(android.R.id.content).getRootView(),
+                        "Too many newlines in title or caption.", 3000).show();
+            }
+
+            //Create new post if valid
+            if(validPost) {
+                String uid = (Objects.requireNonNull(mAuth.getCurrentUser())).getUid();
+                newPost = new Post(uid, title, caption, image, selectedTags,0);
+                Log.i("InspirationActivityPost", "PostInfo: " + newPost);
+
+                Map<String, Object> post = new HashMap<>();
+                post.put("uid", newPost.getUid());
+                post.put("title", newPost.getTitle());
+                post.put("caption", newPost.getCaption());
+                post.put("imageUrl", newPost.getImageUrl());
+                post.put("styles", newPost.getStyles());
+                post.put("timestamp", FieldValue.serverTimestamp()); // Firestore server time
+                post.put("voteCount", newPost.getVoteCount());
+                post.put("votesMap", new HashMap<String, Long>());
+                post.put("likes", newPost.getLikes());
+                post.put("dislikes", newPost.getDislikes());
+
+                FirebaseFirestore.getInstance()
+                        .collection("posts")
+                        .add(post)
+                        .addOnSuccessListener(documentReference -> {
+                            Log.i("Firebase", "Post successfully added!");
+                            Snackbar.make(findViewById(android.R.id.content).getRootView(),
+                                    "Post created!", 3000).show();
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Firebase", "Error adding post", e);
+                        });
+            }
+        }
     }
 
     private void setupKeyboardDismissOnTouch(View rootView) {

@@ -66,7 +66,14 @@ dependencies {
 
     //Chip
     implementation(libs.material.v1110)
+    implementation(libs.material)
     implementation(libs.material3)
     implementation(libs.material3.window.size.class1)
     implementation(libs.material3.adaptive.navigation.suite)
+
+    //CardView
+    implementation(libs.cardview)
+
+    //Flexbox
+    implementation(libs.flexbox)
 }

@@ -159,6 +159,12 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
         this.selectionChangedListener = listener;
     }
 
+    public void clear() {
+        int size = recyclingArrayList.size();
+        recyclingArrayList.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView recycleImage;
         private OnItemListener onItemListener;

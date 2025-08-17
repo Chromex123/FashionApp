@@ -144,6 +144,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        recycleAdapter.clear();
         binding = null;
     }
 
@@ -191,7 +192,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                 .collection("images")
                 .add(newImage)
                 .addOnSuccessListener(documentReference -> {
-                    Log.i("Firebase", "Saved to firestore");
+                    Log.i("Firebase", "Url saved to firestore");
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
