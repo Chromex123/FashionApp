@@ -18,6 +18,11 @@
         tools:layout="@layout/fragment_inspiration" />
 
     <fragment
+        android:id="@+id/nav_your_posts"
+        android:name="com.example.fashionapp.ui.your_posts.YourPostsFragment"
+        android:label="@string/menu_your_posts"
+        tools:layout="@layout/fragment_your_posts" />
+    <fragment
         android:id="@+id/nav_about"
         android:name="com.example.fashionapp.ui.about.AboutFragment"
         android:label="@string/menu_about"

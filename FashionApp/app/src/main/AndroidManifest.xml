@@ -20,6 +20,9 @@
         android:theme="@style/Theme.FashionApp"
         tools:targetApi="31">
         <activity
+            android:name=".ui.your_posts.YourPostsActivityPostDetail"
+            android:exported="false" />
+        <activity
             android:name=".ui.favorites.FavoritesActivityPostDetail"
             android:exported="false" />
         <activity

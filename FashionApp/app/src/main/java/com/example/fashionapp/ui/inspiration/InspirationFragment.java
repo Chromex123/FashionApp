@@ -1,5 +1,6 @@
 package com.example.fashionapp.ui.inspiration;
 
+import static androidx.core.content.ContextCompat.getSystemService;
 import static java.lang.Math.toIntExact;
 import static java.util.Map.entry;
 
@@ -17,7 +18,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.fashionapp.Post;
 import com.example.fashionapp.PostAdapter;
@@ -51,7 +55,11 @@ import java.util.Objects;
 public class InspirationFragment extends Fragment implements PostAdapter.OnImageSelectedListener {
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
+    private PostAdapter queryPostAdapter;
     public static List<Post> postList;
+    private List<Post> queryPostList;
+    private boolean isQueryActive = false;
+    private StringBuilder queryText = new StringBuilder();
     private FragmentInspirationBinding binding;
     private FirebaseAuth mAuth;
     private long mLastClickTimeFilterButton = 0;
@@ -78,7 +86,27 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
 
         super.onViewCreated(root, savedInstanceState);
 
+        //Set up default post adapter
+        postList = new ArrayList<>();
+        postAdapter = new PostAdapter(postList, this, requireContext().getApplicationContext());
+        setUpRecycler(root);
+
+        //Initialize post adapter to use when user queries for posts
+        queryPostList = new ArrayList<>();
+        queryPostAdapter = new PostAdapter(queryPostList, this, requireContext().getApplicationContext());
+
         setupKeyboardDismissOnTouch(root);
+
+        // Set up refresh listener for posts
+        SwipeRefreshLayout swipeRefreshPosts = root.findViewById(R.id.swipeRefreshPosts);
+        RecyclerView recyclerView = root.findViewById(R.id.feedRecyclerView);
+
+        // Reload posts
+        swipeRefreshPosts.setOnRefreshListener(() -> {
+            // Reload your posts here
+            loadPosts();
+            Log.i("InspirationFragment","Posts reloaded");
+        });
 
         ImageButton newPostButton = root.findViewById(R.id.newPostButton);
         newPostButton.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +114,52 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
             public void onClick(View v) {
                 onNewPostButtonClick(v, root);
             }
+        });
+
+        SearchView searchView = root.findViewById(R.id.search_bar);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterPosts(query);
+                hideKeyboard(requireActivity().getCurrentFocus());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(newText.isEmpty()) {
+                    recyclerView.setAdapter(postAdapter);
+                    isQueryActive = false;
+                    Log.i("InspirationFragment","Adapter using posts list");
+                }
+                return true;
+            }
+
+            private void filterPosts(String text) {
+                queryPostList.clear();
+                for (Post post : postList) { // allPostsList = full list from Firestore
+                    if (post.getTitle().toLowerCase().contains(text.trim().toLowerCase())) {
+                        queryPostList.add(post);
+                    }
+                }
+                recyclerView.setAdapter(queryPostAdapter);
+                queryPostAdapter.notifyDataSetChanged();
+
+                queryText.setLength(0);
+                queryText.append(text);
+                isQueryActive = true;
+
+                Log.i("InspirationFragment","Adapter using queried list, queried for: " + queryText.toString());
+            }
+        });
+
+        searchView.setOnCloseListener(() -> {
+            searchView.setQuery("", false);
+            //searchView.setIconified(true);
+            recyclerView.setAdapter(postAdapter);
+            isQueryActive = false;
+            Log.i("InspirationFragment","Adapter using posts list");
+            return false;
         });
 
         LinearLayout filterFeedButton = root.findViewById(R.id.filter_feed_button);
@@ -137,10 +211,6 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
         });
 
         // Load current posts saved in Firestore
-        postList = new ArrayList<>();
-        postAdapter = new PostAdapter(postList, this, requireContext().getApplicationContext());
-        setUpRecycler(root);
-
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             loadPosts(); // safe to call
@@ -150,7 +220,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                         loadPosts();
                     })
                     .addOnFailureListener(e -> {
-                        Log.i("Firebase", "Anonymous sign-in failed", e);
+                        Log.e("Firebase", "Anonymous sign-in failed", e);
                     });
         }
 
@@ -164,6 +234,8 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
             return;
         }
 
+        SwipeRefreshLayout swipeRefreshPosts = binding.getRoot().findViewById(R.id.swipeRefreshPosts);
+
         FirebaseFirestore.getInstance()
                 .collection("posts")
                 .orderBy(currentOrderBy, Query.Direction.DESCENDING)
@@ -171,35 +243,51 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     postList.clear();
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        String uid = doc.getString("uid");
-                        String title = doc.getString("title");
-                        String caption = doc.getString("caption");
-                        String imageUrl = doc.getString("imageUrl");
-                        List<String> styles = (ArrayList<String>) doc.get("styles");
                         Timestamp firestoreTimestamp = doc.getTimestamp("timestamp");
-                        assert firestoreTimestamp != null;
-                        long timestamp = firestoreTimestamp.toDate().getTime();
-                        long voteCount = Objects.requireNonNull(doc.getLong("voteCount"));
-                        long likes = Objects.requireNonNull(doc.getLong("likes"));
-                        long dislikes = Objects.requireNonNull(doc.getLong("dislikes"));
-                        Map<String, Long> votesMap = (Map<String, Long>) Objects.requireNonNull(doc.get("votesMap"));
+                        if(firestoreTimestamp != null) {
+                            String uid = doc.getString("uid");
+                            String title = doc.getString("title");
+                            String caption = doc.getString("caption");
+                            String imageUrl = doc.getString("imageUrl");
+                            List<String> styles = (ArrayList<String>) doc.get("styles");
 
-                        Post post = new Post(uid, title, caption, imageUrl, styles, timestamp);
-                        post.setDocId(doc.getId());
-                        post.setVoteCount(voteCount);
-                        post.setLikes(likes);
-                        post.setDislikes(dislikes);
-                        post.setVotesMap(votesMap);
+                            long timestamp = firestoreTimestamp.toDate().getTime();
+                            long voteCount = Objects.requireNonNull(doc.getLong("voteCount"));
+                            long likes = Objects.requireNonNull(doc.getLong("likes"));
+                            long dislikes = Objects.requireNonNull(doc.getLong("dislikes"));
+                            Map<String, Long> votesMap = (Map<String, Long>) Objects.requireNonNull(doc.get("votesMap"));
 
-                        postList.add(post);
+                            Post post = new Post(uid, title, caption, imageUrl, styles, timestamp);
+                            post.setDocId(doc.getId());
+                            post.setVoteCount(voteCount);
+                            post.setLikes(likes);
+                            post.setDislikes(dislikes);
+                            post.setVotesMap(votesMap);
+
+                            postList.add(post);
+                        }
                     }
-                    postAdapter.notifyDataSetChanged();
+                    if(isQueryActive) {
+                        queryPostList.clear();
+                        for (Post post : postList) { // allPostsList = full list from Firestore
+                            if (post.getTitle().toLowerCase().contains(queryText.toString().trim().toLowerCase())) {
+                                queryPostList.add(post);
+                            }
+                        }
+                        recyclerView.setAdapter(queryPostAdapter);
+                        queryPostAdapter.notifyDataSetChanged();
+                    }else{
+                        recyclerView.setAdapter(postAdapter);
+                        postAdapter.notifyDataSetChanged();
+                    }
+                    swipeRefreshPosts.setRefreshing(false);
                     Log.i("InspirationFragment","Order By: " + currentOrderBy);
                     Log.i("InspirationFragment", "Filter: " + selectedStyles.toString());
                 })
                 .addOnFailureListener(e -> {
-                        Log.e("InspirationFragment", Objects.requireNonNull(e.getMessage()));
-                        Snackbar.make(binding.getRoot(), "Error loading posts", 1000).show();
+                    swipeRefreshPosts.setRefreshing(false);
+                    Log.e("InspirationFragment", Objects.requireNonNull(e.getMessage()));
+                    Snackbar.make(binding.getRoot(), "Error loading posts", 1000).show();
                 });
     }
 
@@ -297,6 +385,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
             return;
         }
 
+        SwipeRefreshLayout swipeRefreshPosts = binding.getRoot().findViewById(R.id.swipeRefreshPosts);
         FirebaseFirestore.getInstance()
                 .collection("posts")
                 .whereArrayContainsAny("styles", selectedStyles)
@@ -307,38 +396,57 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                     for (DocumentSnapshot doc : querySnapshot) {
                         // Check if styles has all selectedStyles before continuing with post creation
                         List<String> styles = (ArrayList<String>) doc.get("styles");
-                        assert styles != null;
-                        if (new HashSet<>(styles).containsAll(selectedStyles)) {
-                            String uid = doc.getString("uid");
-                            String title = doc.getString("title");
-                            String caption = doc.getString("caption");
-                            String imageUrl = doc.getString("imageUrl");
-                            Timestamp firestoreTimestamp = doc.getTimestamp("timestamp");
-                            assert firestoreTimestamp != null;
-                            long timestamp = firestoreTimestamp.toDate().getTime();
-                            long voteCount = Objects.requireNonNull(doc.getLong("voteCount"));
-                            long likes = Objects.requireNonNull(doc.getLong("likes"));
-                            long dislikes = Objects.requireNonNull(doc.getLong("dislikes"));
-                            Map<String, Long> votesMap = (Map<String, Long>) Objects.requireNonNull(doc.get("votesMap"));
+                        if(styles != null) {
+                            if (new HashSet<>(styles).containsAll(selectedStyles)) {
+                                Timestamp firestoreTimestamp = doc.getTimestamp("timestamp");
+                                if(firestoreTimestamp != null) {
+                                    String uid = doc.getString("uid");
+                                    String title = doc.getString("title");
+                                    String caption = doc.getString("caption");
+                                    String imageUrl = doc.getString("imageUrl");
 
-                            Post post = new Post(uid, title, caption, imageUrl, styles, timestamp);
-                            post.setDocId(doc.getId());
-                            post.setVoteCount(voteCount);
-                            post.setLikes(likes);
-                            post.setDislikes(dislikes);
-                            post.setVotesMap(votesMap);
-                            post.setDocId(doc.getId());
+                                    long timestamp = firestoreTimestamp.toDate().getTime();
+                                    long voteCount = Objects.requireNonNull(doc.getLong("voteCount"));
+                                    long likes = Objects.requireNonNull(doc.getLong("likes"));
+                                    long dislikes = Objects.requireNonNull(doc.getLong("dislikes"));
+                                    Map<String, Long> votesMap = (Map<String, Long>) Objects.requireNonNull(doc.get("votesMap"));
 
-                            postList.add(post);
+                                    Post post = new Post(uid, title, caption, imageUrl, styles, timestamp);
+                                    post.setDocId(doc.getId());
+                                    post.setVoteCount(voteCount);
+                                    post.setLikes(likes);
+                                    post.setDislikes(dislikes);
+                                    post.setVotesMap(votesMap);
+                                    post.setDocId(doc.getId());
+
+                                    postList.add(post);
+                                }
+                            }
                         }
                     }
-                    postAdapter.notifyDataSetChanged();
+                    if(isQueryActive) {
+                        queryPostList.clear();
+                        for (Post post : postList) { // allPostsList = full list from Firestore
+                            if (post.getTitle().toLowerCase().contains(queryText.toString().trim().toLowerCase())) {
+                                queryPostList.add(post);
+                            }
+                        }
+                        recyclerView.setAdapter(queryPostAdapter);
+                        queryPostAdapter.notifyDataSetChanged();
+                    }else{
+                        recyclerView.setAdapter(postAdapter);
+                        postAdapter.notifyDataSetChanged();
+                    }
+                    swipeRefreshPosts.setRefreshing(false);
+
                     TextView stylesText = binding.getRoot().findViewById(R.id.filter_feed_text);
                     stylesText.setTextColor(requireContext().getApplicationContext().getResources().getColor(R.color.teal_700, null));
                     Log.i("InspirationFragment","Order By: " + currentOrderBy);
                     Log.i("InspirationFragment", "Filter: " + selectedStyles.toString());
                 })
                 .addOnFailureListener(e -> {
+                    swipeRefreshPosts.setRefreshing(false);
+
                     Log.e("InspirationFragment", Objects.requireNonNull(e.getMessage()));
                     Snackbar.make(binding.getRoot(), "Error loading posts", 1000).show();
                 });

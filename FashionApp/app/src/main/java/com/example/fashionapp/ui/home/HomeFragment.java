@@ -197,7 +197,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.i("Firebase", Objects.requireNonNull(e.getMessage()));
+                        Log.e("Firebase", "Error uploading image to firestore", e);
                     }
                 });
     }

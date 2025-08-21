@@ -1,14 +1,13 @@
-package com.example.fashionapp.ui.about;
+package com.example.fashionapp.ui.your_posts;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class AboutViewModel extends ViewModel {
-
+public class YourPostsViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
 
-    public AboutViewModel() {
+    public YourPostsViewModel() {
         mText = new MutableLiveData<>();
     }
 

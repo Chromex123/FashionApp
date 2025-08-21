@@ -38,12 +38,21 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class InspirationActivityPost extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -234,6 +243,7 @@ public class InspirationActivityPost extends AppCompatActivity {
 
             //Create new post if valid
             if(validPost) {
+                //Change here
                 String uid = (Objects.requireNonNull(mAuth.getCurrentUser())).getUid();
                 newPost = new Post(uid, title, caption, image, selectedTags,0);
                 Log.i("InspirationActivityPost", "PostInfo: " + newPost);
@@ -244,7 +254,8 @@ public class InspirationActivityPost extends AppCompatActivity {
                 post.put("caption", newPost.getCaption());
                 post.put("imageUrl", newPost.getImageUrl());
                 post.put("styles", newPost.getStyles());
-                post.put("timestamp", FieldValue.serverTimestamp()); // Firestore server time
+                FieldValue timestamp = FieldValue.serverTimestamp();
+                post.put("timestamp", timestamp); // Firestore server time
                 post.put("voteCount", newPost.getVoteCount());
                 post.put("votesMap", new HashMap<String, Long>());
                 post.put("likes", newPost.getLikes());
@@ -253,15 +264,75 @@ public class InspirationActivityPost extends AppCompatActivity {
                 FirebaseFirestore.getInstance()
                         .collection("posts")
                         .add(post)
-                        .addOnSuccessListener(documentReference -> {
-                            Log.i("Firebase", "Post successfully added!");
-                            Snackbar.make(findViewById(android.R.id.content).getRootView(),
-                                    "Post created!", 3000).show();
-                            finish();
+                        .addOnSuccessListener(dRef -> {
+                            //Add to user's posts
+                            Map<String, Object> savedData = new HashMap<>();
+                            savedData.put("postRef", FirebaseFirestore.getInstance().collection("posts").document(dRef.getId()));
+                            savedData.put("createdAt", timestamp);
+
+                            FirebaseFirestore.getInstance()
+                                    .collection("user_gallery")
+                                    .document(uid)
+                                    .collection("your_posts")
+                                    .add(savedData)
+                                    .addOnSuccessListener(docRef -> {
+                                        Log.i("Firebase", "Post successfully added to user's posts!");
+                                        Snackbar.make(findViewById(android.R.id.content).getRootView(),
+                                                "Post created!", 3000).show();
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("Firebase", "Error adding post to user's posts", e);
+                                    });
+
+                            //Store copy of post image
+                            StorageReference postImageRef = FirebaseStorage.getInstance()
+                                    .getReference()
+                                    .child("post_images")
+                                    .child(uid)
+                                    .child(dRef.getId() + ".jpg");
+                            Log.i("Firebase", "dref Id: " + dRef.getId());
+
+                            // Download to temp file
+                            try {
+                                File localFile = File.createTempFile("tempImage", ".jpg");
+                                new Thread(() -> {
+                                    try (InputStream in = new URL(newPost.getImageUrl()).openStream();
+                                         OutputStream out = new FileOutputStream(localFile)) {
+                                        byte[] buffer = new byte[4096];
+                                        int bytesRead;
+                                        while ((bytesRead = in.read(buffer)) != -1) {
+                                            out.write(buffer, 0, bytesRead);
+                                        }
+
+                                        Uri fileUri = Uri.fromFile(localFile);
+                                        postImageRef.putFile(fileUri)
+                                                .addOnSuccessListener(taskSnapshot -> postImageRef.getDownloadUrl()
+                                                        .addOnSuccessListener(uri -> {
+                                                            dRef.update("imageUrl", String.valueOf(Uri.parse(uri.toString())))
+                                                                    .addOnSuccessListener(v -> {
+                                                                        Log.i("Firebase", "Changed post url field to copy");
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Log.e("Firebase", "Error changing post url field to copy", e);
+                                                                    });
+                                                            Log.i("Firebase", "Post image copy made");
+                                                        }))
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("Firebase", "Error making post image copy", e);
+                                                });
+                                    } catch (IOException e) {
+                                        Log.e("Firebase", "Error making post image copy, input stream", e);
+                                    }
+                                }).start();
+                            } catch (IOException e) {
+                                Log.e("Firebase", "Error making post image copy, temp file", e);
+                            }
                         })
                         .addOnFailureListener(e -> {
-                            Log.e("Firebase", "Error adding post", e);
+                            Log.e("Firebase", "Error adding post to feed", e);
                         });
+
             }
         }
     }

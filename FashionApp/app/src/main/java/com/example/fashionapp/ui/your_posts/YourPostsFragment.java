@@ -1,24 +1,27 @@
-package com.example.fashionapp.ui.favorites;
+package com.example.fashionapp.ui.your_posts;
 
+import androidx.lifecycle.ViewModelProvider;
+
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.widget.Toast;
 
 import com.example.fashionapp.Post;
 import com.example.fashionapp.PostAdapter;
 import com.example.fashionapp.R;
-import com.example.fashionapp.databinding.FragmentFavoritesBinding;
-import com.example.fashionapp.ui.inspiration.InspirationActivityPostDetail;
+import com.example.fashionapp.YourPostAdapter;
+import com.example.fashionapp.databinding.FragmentYourPostsBinding;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,37 +36,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSelectedListener{
+public class YourPostsFragment extends Fragment implements YourPostAdapter.OnImageSelectedListener, YourPostAdapter.OnDeleteButtonListener {
 
-    private FragmentFavoritesBinding binding;
+    private FragmentYourPostsBinding binding;
     private RecyclerView recyclerView;
-    private PostAdapter postAdapter;
-    public static List<Post> savedPostsList;
+    private YourPostAdapter postAdapter;
+    public static List<Post> yourPostsList;
     private FirebaseAuth mAuth;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
 
-        FavoritesViewModel favoritesViewModel =
-                new ViewModelProvider(this).get(FavoritesViewModel.class);
+        YourPostsViewModel yourPostsViewModel =
+                new ViewModelProvider(this).get(YourPostsViewModel.class);
 
-        binding = FragmentFavoritesBinding.inflate(inflater, container, false);
+        binding = FragmentYourPostsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         // Load current posts saved in Firestore
-        savedPostsList = new ArrayList<>();
-        postAdapter = new PostAdapter(savedPostsList, this, requireContext().getApplicationContext());
+        yourPostsList = new ArrayList<>();
+        postAdapter = new YourPostAdapter(yourPostsList, this, this, requireContext().getApplicationContext());
         setUpRecycler(root);
 
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            loadSavedPosts(); // safe to call
+            loadYourPosts(); // safe to call
         } else {
             mAuth.signInAnonymously()
                     .addOnSuccessListener(authResult -> {
-                        loadSavedPosts();
-                        Log.i("FavoritesFragment", "Saved posts loaded");
+                        loadYourPosts();
+                        Log.i("YourPostsFragment", "Saved posts loaded");
                     })
                     .addOnFailureListener(e -> {
                         Log.e("Firebase", "Anonymous sign-in failed", e);
@@ -73,16 +76,16 @@ public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSe
         return root;
     }
 
-    private void loadSavedPosts() {
+    private void loadYourPosts() {
         String uid = (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser())).getUid();
         FirebaseFirestore.getInstance()
                 .collection("user_gallery")
                 .document(uid)
-                .collection("saved_posts")
-                .orderBy("savedAt", Query.Direction.DESCENDING)
+                .collection("your_posts")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    savedPostsList.clear();
+                    yourPostsList.clear();
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         DocumentReference postRef = doc.getDocumentReference("postRef");
 
@@ -109,38 +112,38 @@ public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSe
                                         post.setDislikes(dislikes);
                                         post.setVotesMap(votesMap);
 
-                                        savedPostsList.add(post);
-                                        postAdapter.notifyItemInserted(savedPostsList.size()-1);
+                                        yourPostsList.add(post);
+                                        postAdapter.notifyItemInserted(yourPostsList.size()-1);
                                     }
                                 }else{
                                     FirebaseFirestore.getInstance().collection("user_gallery")
                                             .document(uid)
-                                            .collection("saved_posts")
+                                            .collection("your_posts")
                                             .document(doc.getId())
                                             .delete()
                                             .addOnSuccessListener(aVoid -> {
-                                                Log.i("FavoritesFragment", "PostRef deleted in saved posts");
+                                                Log.i("YourPostsFragment", "PostRef deleted in user's posts");
                                             })
                                             .addOnFailureListener(e -> {
-                                                Log.e("FavoritesFragment", "Could not delete PostRef", e);
+                                                Log.e("YourPostsFragment", "Could not delete PostRef", e);
                                             });
                                 }
                             }).addOnFailureListener(e -> {
-                                Log.e("FavoritesFragment", "Error loading post", e);
+                                Log.e("YourPostsFragment", "Error loading post", e);
                                 Snackbar.make(binding.getRoot(), "Error loading a post", 1000).show();
                             });
                         }
                     }
-                    Log.i("FavoritesFragment","User's saved posts loaded");
+                    Log.i("YourPostsFragment","User's posts loaded");
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("FavoritesFragment", "Error loading saved posts", e);
+                    Log.e("YourPostsFragment", "Error loading saved posts", e);
                     Snackbar.make(binding.getRoot(), "Error loading saved posts", 1000).show();
                 });
     }
 
     private void setUpRecycler(View root) {
-        recyclerView = (RecyclerView) root.findViewById(R.id.savedPostsRecyclerView);
+        recyclerView = (RecyclerView) root.findViewById(R.id.yourPostsRecyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext().getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(postAdapter);
@@ -148,15 +151,45 @@ public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSe
 
     @Override
     public void onItemClick(int position) {
-        Intent detailIntent = new Intent(requireContext().getApplicationContext(), FavoritesActivityPostDetail.class);
+        Intent detailIntent = new Intent(requireContext().getApplicationContext(), YourPostsActivityPostDetail.class);
         detailIntent.putExtra("position", position);
         startActivity(detailIntent);
-        Log.i("FavoritesFragment", "Saved Post Detail Activity Started");
+        Log.i("YourPostsFragment", "Saved Post Detail Activity Started");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onDeleteButtonClick(int position) {
+        Post post = yourPostsList.get(position);
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Post")
+                .setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton("DELETE", (dialog, which) -> {
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                    db.collection("posts")
+                            .document(post.getDocId())
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                //Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
+                                Log.i("YourPostsFragment", "success");
+                                // Remove from local list + update adapter
+                                yourPostsList.remove(position);
+                                postAdapter.notifyItemRemoved(position);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.i("YourPostsFragment", "fail");
+                                //Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .setNegativeButton("CANCEL", (dialog, which) -> {
+                    dialog.dismiss(); // Just close the dialog
+                })
+                .show();
     }
 }
