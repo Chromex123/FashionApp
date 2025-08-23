@@ -7,6 +7,7 @@
     tools:context=".ui.your_posts.YourPostsFragment"
     android:background="@color/bg_color">
 
+    <!-- For displaying posts -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/yourPostsRecyclerView"
         android:layout_width="match_parent"

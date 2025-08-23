@@ -15,14 +15,16 @@
         android:scaleType="centerCrop"
         android:cropToPadding="true"
         android:src="@drawable/round_add_circle_24"
-        />
+        android:contentDescription="Image"/>
 
+    <!-- Loading circle for image -->
     <ProgressBar
         android:id="@+id/image_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
+    <!-- For showing whether image is currently selected -->
     <View
         android:id="@+id/selection_overlay"
         android:layout_width="match_parent"
@@ -30,7 +32,6 @@
         android:background="#66000000"
         android:visibility="gone"
         />
-
     <ImageView
         android:id="@+id/check_icon"
         android:layout_width="24dp"
@@ -40,6 +41,5 @@
         android:visibility="gone"
         android:src="@drawable/ic_check_circle"
          />
-
 
 </FrameLayout>

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:padding="16dp"
-android:fillViewport="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:fillViewport="true"
+    android:background="@color/bar_color">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,27 +16,34 @@ android:fillViewport="true">
         <!-- Post Title -->
         <EditText
             android:id="@+id/postTitle"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:minWidth="48dp"
             android:hint="Title"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             android:padding="12dp"
+            android:layout_gravity="center"
             android:layout_marginBottom="12dp"
             android:layout_marginTop="8dp"
             android:maxLines="2"
-            android:maxLength="100"/>
+            android:maxLength="100"
+            android:inputType="text"/>
 
         <!-- Caption -->
         <EditText
             android:id="@+id/postCaption"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:hint="Describe the fit (ex: Pacsun Baggy Jeans $30)"
+            android:textColorHint="@color/light_gray"
+            android:textColor="@color/white"
             android:inputType="textMultiLine"
             android:gravity="top"
+            android:layout_gravity="center"
             android:padding="12dp"
             android:layout_marginBottom="4dp"
             android:textSize="11sp"
@@ -85,7 +93,7 @@ android:fillViewport="true">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="73dp"
             android:fillViewport="true">
 
             <com.google.android.material.chip.ChipGroup
@@ -94,21 +102,21 @@ android:fillViewport="true">
                 android:layout_height="wrap_content"
                 app:singleSelection="false"
                 app:selectionRequired="false"
-                app:chipSpacing="8dp">
+                app:chipSpacing="1dp">
 
-                <!-- Add more tags as needed -->
             </com.google.android.material.chip.ChipGroup>
         </ScrollView>
 
         <!-- Submit Post Button -->
         <Button
             android:id="@+id/submitPostButton"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:text="Post"
             android:backgroundTint="?attr/colorPrimary"
             android:textColor="@android:color/white"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal"/>
 
         <View
             android:id="@+id/snackbarAnchor"

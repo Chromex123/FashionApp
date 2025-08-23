@@ -30,7 +30,7 @@
         <!-- Copyright Button -->
         <Button
             android:id="@+id/copyrightButton"
-            android:layout_width="0dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Copyright"
             android:backgroundTint="@color/black"
@@ -42,7 +42,7 @@
         <!-- Terms of Service Button -->
         <Button
             android:id="@+id/termsButton"
-            android:layout_width="0dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Terms of Service"
             android:backgroundTint="@color/black"
@@ -55,7 +55,7 @@
         <!-- Privacy Policy Button -->
         <Button
             android:id="@+id/privacyButton"
-            android:layout_width="0dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Privacy Policy"
             android:backgroundTint="@color/black"

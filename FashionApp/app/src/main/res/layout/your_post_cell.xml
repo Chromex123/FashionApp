@@ -36,7 +36,8 @@
                 android:id="@+id/postImage"
                 android:layout_width="250dp"
                 android:layout_height="350dp"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:contentDescription="Post Image"/>
         </androidx.cardview.widget.CardView>
 
         <!-- Voting section -->
@@ -86,6 +87,7 @@
                 app:tint="@color/white"
                 android:contentDescription="Save" />
 
+            <!-- Delete post button -->
             <ImageButton
                 android:id="@+id/deletePostButton"
                 android:layout_width="48dp"

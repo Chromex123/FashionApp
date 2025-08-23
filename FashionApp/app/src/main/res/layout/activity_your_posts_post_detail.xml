@@ -6,7 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:fillViewport="true"
     android:padding="8dp"
-    tools:context=".ui.your_posts.YourPostsActivityPostDetail">
+    tools:context=".ui.your_posts.YourPostsActivityPostDetail"
+    android:background="@color/bg_color">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -15,13 +16,16 @@
         android:gravity="center_horizontal"
         android:layout_gravity="center">
 
+        <!-- Post Image -->
         <ImageView
             android:id="@+id/selectedPostImage"
             android:layout_width="400dp"
             android:layout_height="500dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/inspiration_default_image" />
+            android:src="@drawable/inspiration_default_image"
+            android:contentDescription="Post Image"/>
 
+        <!-- Post Styles -->
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/selectedPostStyles"
             android:layout_width="match_parent"
@@ -32,6 +36,7 @@
 
         </com.google.android.flexbox.FlexboxLayout>
 
+        <!-- Post Caption -->
         <TextView
             android:id="@+id/selectedPostCaption"
             android:layout_width="wrap_content"

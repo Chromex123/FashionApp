@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
+    <!-- How long ago post was made -->
     <TextView
         android:id="@+id/postTime"
         android:layout_width="wrap_content"
@@ -13,6 +14,7 @@
         android:textColor="@color/light_gray"
         android:textSize="12sp"
         android:layout_marginTop="2dp"/>
+    <!-- Post title -->
     <TextView
         android:id="@+id/postTitle"
         android:layout_width="wrap_content"
@@ -21,6 +23,7 @@
         android:textSize="16sp"
         android:textColor="@color/white"/>
 
+    <!-- Post image -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
@@ -35,7 +38,8 @@
                 android:id="@+id/postImage"
                 android:layout_width="250dp"
                 android:layout_height="350dp"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:contentDescription="Post Image"/>
         </androidx.cardview.widget.CardView>
 
         <!-- Voting section -->
@@ -75,6 +79,7 @@
                 app:tint="@color/white"
                 android:contentDescription="Downvote" />
 
+            <!-- Save post button -->
             <ImageButton
                 android:id="@+id/saveButton"
                 android:layout_width="48dp"
@@ -87,6 +92,7 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Post styles -->
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/postStyles"
         android:layout_width="match_parent"
@@ -97,6 +103,7 @@
 
     </com.google.android.flexbox.FlexboxLayout>
 
+    <!-- Post caption -->
     <TextView
         android:id="@+id/postCaption"
         android:layout_width="wrap_content"

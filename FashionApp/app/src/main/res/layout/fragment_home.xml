@@ -7,6 +7,7 @@
     tools:context=".ui.home.HomeFragment"
     android:background="@color/bg_color">
 
+    <!-- For displaying images -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycle_view"
         android:layout_width="match_parent"
@@ -26,6 +27,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Add Photo Button -->
     <ImageButton
         android:id="@+id/addPhotoButton"
         android:layout_width="wrap_content"
@@ -57,6 +59,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Delete Button -->
         <LinearLayout
             android:id="@+id/delete_button"
             android:layout_width="wrap_content"
@@ -76,7 +79,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_home_delete"
-                app:tint="@color/white" />
+                app:tint="@color/white"
+                android:contentDescription="Delete Icon"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -87,7 +91,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Cancel Button with Icon + Text -->
+        <!-- Cancel Button -->
         <LinearLayout
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
@@ -107,7 +111,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_home_cancel"
-                app:tint="@color/white" />
+                app:tint="@color/white"
+                android:contentDescription="Cancel Icon"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -129,24 +134,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:orientation="vertical">
-
-
-
-
-        </RelativeLayout>
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- # Items Selected View -->
     <TextView
         android:id="@+id/selection_count_badge"
         android:layout_width="wrap_content"

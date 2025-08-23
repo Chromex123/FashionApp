@@ -7,6 +7,7 @@
     tools:context=".ui.inspiration.InspirationFragment"
     android:background="@color/bg_color">
 
+    <!-- Bar with search, filter and sort buttons -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/filter_feed_bar"
         android:layout_width="match_parent"
@@ -135,6 +136,7 @@
         app:layout_constraintTop_toBottomOf="@id/filter_feed_bar"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- For displaying posts -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/feedRecyclerView"
             android:layout_width="match_parent"
@@ -144,6 +146,7 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!-- Create new post button -->
     <ImageButton
         android:id="@+id/newPostButton"
         android:layout_width="wrap_content"

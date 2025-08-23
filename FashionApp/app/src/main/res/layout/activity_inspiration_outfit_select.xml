@@ -3,7 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main">
+    android:id="@+id/main"
+    android:background="@color/bg_color">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/outfitRecyclerView"

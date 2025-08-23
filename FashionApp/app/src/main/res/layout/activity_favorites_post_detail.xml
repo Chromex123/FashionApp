@@ -6,7 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:fillViewport="true"
     android:padding="8dp"
-    tools:context=".ui.favorites.FavoritesActivityPostDetail">
+    tools:context=".ui.favorites.FavoritesActivityPostDetail"
+    android:background="@color/bg_color">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -20,7 +21,8 @@
             android:layout_width="400dp"
             android:layout_height="500dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/inspiration_default_image" />
+            android:src="@drawable/inspiration_default_image"
+            android:contentDescription="Post Image"/>
 
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/selectedPostStyles"
