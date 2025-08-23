@@ -30,6 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * YourPostAdapter binds post data to the RecyclerView
+ * in the user's created posts screen. Handles displaying post images, captions, tags,
+ * and any associated actions such as saving, voting, and deleting posts.
+ */
 public class YourPostAdapter extends RecyclerView.Adapter<YourPostAdapter.PostViewHolder> {
     private List<Post> postList;
     Context context;
@@ -81,7 +86,6 @@ public class YourPostAdapter extends RecyclerView.Adapter<YourPostAdapter.PostVi
             }
         });
 
-        //Glide.with(context).load(post.getImageUrl()).into(holder.image);
 
         // Set the vote count of the post
         holder.voteCount.setText(String.valueOf(post.getVoteCount()));
@@ -117,7 +121,7 @@ public class YourPostAdapter extends RecyclerView.Adapter<YourPostAdapter.PostVi
                 })
                 .addOnFailureListener(e -> {
                     //Snackbar.make(holder.itemView, "Failed to unsave post", 1000).show();
-                    Log.e("InspirationFragment","Failed to retrieve post", e);
+                    //Log.e("InspirationFragment","Failed to retrieve post", e);
                 });
 
         holder.upvoteButton.setOnClickListener(v -> {
@@ -154,12 +158,12 @@ public class YourPostAdapter extends RecyclerView.Adapter<YourPostAdapter.PostVi
                     postRef.delete()
                             .addOnSuccessListener(aVoid -> {
                                 //Snackbar.make(holder.itemView, "Post unsaved", 1000).show();
-                                Log.i("InspirationFragment","Post unsaved");
+                                //Log.i("InspirationFragment","Post unsaved");
                                 holder.saveButton.setColorFilter(Color.WHITE);
                             })
                             .addOnFailureListener(e -> {
                                 //Snackbar.make(holder.itemView, "Failed to unsave post", 1000).show();
-                                Log.e("InspirationFragment","Failed to unsave post", e);
+                                //Log.e("InspirationFragment","Failed to unsave post", e);
                             });
                 } else {
                     //If Post not saved then save it
@@ -169,12 +173,12 @@ public class YourPostAdapter extends RecyclerView.Adapter<YourPostAdapter.PostVi
 
                     postRef.set(savedData)
                             .addOnSuccessListener(aVoid -> {
-                                Log.i("InspirationFragment","Post saved success");
+                                //Log.i("InspirationFragment","Post saved success");
                                 holder.saveButton.setColorFilter(Color.YELLOW);
                             })
                             .addOnFailureListener(e -> {
                                 //Snackbar.make(holder.itemView, "Failed to save post", 1000).show();
-                                Log.e("InspirationFragment","Failed to save post", e);
+                                //Log.e("InspirationFragment","Failed to save post", e);
                             });
                 }
             });
@@ -271,7 +275,7 @@ public class YourPostAdapter extends RecyclerView.Adapter<YourPostAdapter.PostVi
                     post.setVoteCount(voteCount);
                 }
             } else {
-                // No previous vote → add it
+                // No previous vote so add it
                 votesMap.put(uid, (long) newVoteValue);
                 post.setVotesMap(votesMap);
                 voteCount += newVoteValue;
@@ -283,9 +287,9 @@ public class YourPostAdapter extends RecyclerView.Adapter<YourPostAdapter.PostVi
             return null;
         }).addOnSuccessListener(aVoid -> {
             notifyItemChanged(holder.getBindingAdapterPosition());
-            Log.i("InspirationFragment", "Vote updated successfully");
+            //Log.i("InspirationFragment", "Vote updated successfully");
         }).addOnFailureListener(e -> {
-            Log.e("InspirationFragment", "Failed to update vote", e);
+            //Log.e("InspirationFragment", "Failed to update vote", e);
         });
     }
 

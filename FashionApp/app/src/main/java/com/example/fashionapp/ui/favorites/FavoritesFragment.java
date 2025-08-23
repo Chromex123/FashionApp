@@ -2,11 +2,9 @@ package com.example.fashionapp.ui.favorites;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,7 +16,6 @@ import com.example.fashionapp.Post;
 import com.example.fashionapp.PostAdapter;
 import com.example.fashionapp.R;
 import com.example.fashionapp.databinding.FragmentFavoritesBinding;
-import com.example.fashionapp.ui.inspiration.InspirationActivityPostDetail;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * FavoritesFragment uses Firebase to display all posts that the user has saved to view later.
+ */
 public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSelectedListener{
 
     private FragmentFavoritesBinding binding;
@@ -63,16 +63,19 @@ public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSe
             mAuth.signInAnonymously()
                     .addOnSuccessListener(authResult -> {
                         loadSavedPosts();
-                        Log.i("FavoritesFragment", "Saved posts loaded");
+                        //Log.i("FavoritesFragment", "Saved posts loaded");
                     })
                     .addOnFailureListener(e -> {
-                        Log.e("Firebase", "Anonymous sign-in failed", e);
+                        //Log.e("Firebase", "Anonymous sign-in failed", e);
                     });
         }
 
         return root;
     }
 
+    /**
+     * Load the user's saved posts from Firestore to display.
+     */
     private void loadSavedPosts() {
         String uid = (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser())).getUid();
         FirebaseFirestore.getInstance()
@@ -113,28 +116,29 @@ public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSe
                                         postAdapter.notifyItemInserted(savedPostsList.size()-1);
                                     }
                                 }else{
+                                    // If the document does not exist, delete it
                                     FirebaseFirestore.getInstance().collection("user_gallery")
                                             .document(uid)
                                             .collection("saved_posts")
                                             .document(doc.getId())
                                             .delete()
                                             .addOnSuccessListener(aVoid -> {
-                                                Log.i("FavoritesFragment", "PostRef deleted in saved posts");
+                                                //Log.i("FavoritesFragment", "PostRef deleted in saved posts");
                                             })
                                             .addOnFailureListener(e -> {
-                                                Log.e("FavoritesFragment", "Could not delete PostRef", e);
+                                                //Log.e("FavoritesFragment", "Could not delete PostRef", e);
                                             });
                                 }
                             }).addOnFailureListener(e -> {
-                                Log.e("FavoritesFragment", "Error loading post", e);
+                                //Log.e("FavoritesFragment", "Error loading post", e);
                                 Snackbar.make(binding.getRoot(), "Error loading a post", 1000).show();
                             });
                         }
                     }
-                    Log.i("FavoritesFragment","User's saved posts loaded");
+                    //Log.i("FavoritesFragment","User's saved posts loaded");
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("FavoritesFragment", "Error loading saved posts", e);
+                    //Log.e("FavoritesFragment", "Error loading saved posts", e);
                     Snackbar.make(binding.getRoot(), "Error loading saved posts", 1000).show();
                 });
     }
@@ -146,12 +150,15 @@ public class FavoritesFragment extends Fragment implements PostAdapter.OnImageSe
         recyclerView.setAdapter(postAdapter);
     }
 
+    /**
+     * Shows a detailed view of the post when the user clicks on the post's image in their saved posts screen.
+     */
     @Override
     public void onItemClick(int position) {
         Intent detailIntent = new Intent(requireContext().getApplicationContext(), FavoritesActivityPostDetail.class);
         detailIntent.putExtra("position", position);
         startActivity(detailIntent);
-        Log.i("FavoritesFragment", "Saved Post Detail Activity Started");
+        //Log.i("FavoritesFragment", "Saved Post Detail Activity Started");
     }
 
     @Override

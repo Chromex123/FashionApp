@@ -23,6 +23,10 @@ import com.bumptech.glide.request.target.Target;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * OutfitAdapter binds images to the RecyclerView in the image select screen when creating a post to display
+ * in a neat grid view.
+ */
 public class OutfitAdapter extends RecyclerView.Adapter<OutfitAdapter.OutfitViewHolder> {
 
     private Context context;

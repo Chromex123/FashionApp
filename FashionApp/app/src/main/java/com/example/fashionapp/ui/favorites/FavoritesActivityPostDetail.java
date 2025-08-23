@@ -6,21 +6,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 
 import com.bumptech.glide.Glide;
 import com.example.fashionapp.Post;
 import com.example.fashionapp.R;
-import com.example.fashionapp.ui.inspiration.InspirationFragment;
 import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.Objects;
 
+/**
+ * FavoritesActivityPostDetail displays a more detailed view of the post the user clicked on,
+ * displaying a larger image and the post's description.
+ */
 public class FavoritesActivityPostDetail extends AppCompatActivity {
     private ImageView postImage;
     private TextView postCaption;
@@ -30,21 +30,19 @@ public class FavoritesActivityPostDetail extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //EdgeToEdge.enable(this);
         Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_favorites_post_detail);
 
-
-        setUpViews();
-        getPostInfo();
-    }
-
-    private void setUpViews() {
         postImage = (ImageView) findViewById(R.id.selectedPostImage);
         postCaption = (TextView) findViewById(R.id.selectedPostCaption);
         postStyles = (FlexboxLayout) findViewById(R.id.selectedPostStyles);
+        getPostInfo();
     }
 
+    /**
+     * Gets the image, styles, and caption of the selected post from the user's saved posts screen
+     * to display.
+     */
     private void getPostInfo() {
         Intent prevIntent = getIntent();
         int position = prevIntent.getIntExtra("position", 0);
@@ -64,7 +62,6 @@ public class FavoritesActivityPostDetail extends AppCompatActivity {
                 tagView.setBackgroundResource(R.drawable.bg_inspiration_styles);
                 tagView.setTextColor(ContextCompat.getColorStateList(this, R.color.white));
 
-                // Optional: margin
                 FlexboxLayout.LayoutParams params = new FlexboxLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -72,7 +69,6 @@ public class FavoritesActivityPostDetail extends AppCompatActivity {
                 params.setMargins(8, 8, 8, 8);
                 tagView.setLayoutParams(params);
 
-                // Make selectable
                 tagView.setClickable(false);
 
                 postStyles.addView(tagView);

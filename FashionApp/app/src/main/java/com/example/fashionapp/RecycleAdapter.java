@@ -26,6 +26,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * RecycleAdapter binds images to the RecyclerView in main app screen, displaying the user's
+ * uploaded images in a neat grid view.
+ */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHolder> {
 
     private Context context;
@@ -71,7 +75,6 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
                 }
             })
             .into(holder.recycleImage);
-        //holder.recycleImage.setImageURI(recyclingArrayList.get(position));
 
         boolean selected = selectedPositions.contains(holder.getBindingAdapterPosition());
         holder.overlay.setVisibility(selected ? View.VISIBLE : View.GONE);
@@ -105,7 +108,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
                     notifyDataSetChanged();
                 }
             } else {
-                // Normal click behavior (e.g., open image fullscreen)
+                // Normal click behavior
                 if (onItemListener != null) {
                     onItemListener.onItemClick(holder.getBindingAdapterPosition());
                 }
@@ -152,7 +155,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
     public void clearSelection() {
         selectedPositions.clear();
         selectionMode = false;
-        this.notifyDataSetChanged(); //remove 'this' if error
+        this.notifyDataSetChanged();
     }
 
     public void setOnSelectionChangedListener(OnSelectionChangedListener listener) {
@@ -184,7 +187,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
 
         @Override
         public void onClick(View view) {
-            Log.i("HomeFragment","Item click");
+            //Log.i("HomeFragment","Item click");
             onItemListener.onItemClick(getBindingAdapterPosition());
         }
     }

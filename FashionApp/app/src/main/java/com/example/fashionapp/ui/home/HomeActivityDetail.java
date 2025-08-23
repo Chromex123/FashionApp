@@ -16,6 +16,9 @@ import com.example.fashionapp.R;
 
 import java.util.Objects;
 
+/**
+ * HomeActivityDetail displays a larger view of the image the user clicked on.
+ */
 public class HomeActivityDetail extends AppCompatActivity {
 
     private ImageView recycleImage;
@@ -27,16 +30,14 @@ public class HomeActivityDetail extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_home_detail);
 
-        setUpViews();
+        recycleImage = (ImageView) findViewById(R.id.photo_detail);
         getRecycling();
 
     }
 
-    private void setUpViews() {
-        recycleImage = (ImageView) findViewById(R.id.photo_detail);
-
-    }
-
+    /**
+     * Display a larger view of the image the user clicked on in their uploaded images screen.
+     */
     private void getRecycling() {
         Intent prevIntent = getIntent();
         int position = prevIntent.getIntExtra("position", 0);

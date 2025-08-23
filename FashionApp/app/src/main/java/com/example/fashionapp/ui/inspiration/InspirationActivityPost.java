@@ -3,6 +3,8 @@ package com.example.fashionapp.ui.inspiration;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -24,6 +26,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -54,6 +57,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * InspirationActivityPost displays a basic layout for creating a post, allowing the user to enter a
+ * post title, description, select an image, and select styles associated with the outfit in the image.
+ * Post information is saved to Firestore when submitted.
+ */
+
 public class InspirationActivityPost extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private String image = "";
@@ -63,8 +72,10 @@ public class InspirationActivityPost extends AppCompatActivity {
     private long mLastClickTimeImageView = 0;
     private final long mClickIntervalImageView = 1000;
     private boolean outfitSelected = false;
-    public static final String[] styles = {"Men", "Women", "Casual", "Formal", "Streetwear", "Baggy",
-                                     "Sporty", "Vintage", "Chic", "Retro", "Old Money", "Business Casual"};
+    public static final String[] styles = {"Men", "Women", "Baggy", "Business Casual", "Casual",
+            "Chic", "Classic", "Formal", "Grunge", "Minimalist", "Old Money", "Preppy", "Punk", "Retro", "Romantic",
+            "Streetwear", "Sporty", "Vintage", "Y2K"
+        };
     private final int maxTitleNewlines = 4;
     private final int maxCaptionNewlines = 25;
 
@@ -102,12 +113,6 @@ public class InspirationActivityPost extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_inspiration_post);
-        /*
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        }); */
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -139,6 +144,8 @@ public class InspirationActivityPost extends AppCompatActivity {
             chip.setCheckable(true);
             chip.setClickable(true);
             chip.setCheckedIconVisible(true);
+            chip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.bg_color)));
+            chip.setTextColor(Color.WHITE);
 
             chipGroup.addView(chip);
         }
@@ -163,14 +170,14 @@ public class InspirationActivityPost extends AppCompatActivity {
     }
 
     private void onSelectOutfitButtonClick(View clicked) {
-        Log.i("InspirationActivityPost","Button click");
+        //Log.i("InspirationActivityPost","Button click");
         ((Button) clicked).setEnabled(false);
         Intent intent = new Intent(getApplicationContext(), InspirationActivityOutfitSelect.class);
         launcher.launch(intent);
     }
 
     private void onSelectedImageViewClick(View clicked) {
-        Log.i("InspirationActivityPost","ImageView click");
+        //Log.i("InspirationActivityPost","ImageView click");
         //Prevent double tapping
         if(SystemClock.elapsedRealtime() - mLastClickTimeImageView < mClickIntervalImageView) {
             return;
@@ -182,6 +189,10 @@ public class InspirationActivityPost extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * First checks if the user's post has the required information filled in and then
+     * uploads the post's info to firestore and makes a copy of the image url in the post.
+     */
     private void onSubmitPostButtonClick(View clicked) {
         boolean validPost = true;
 
@@ -243,10 +254,9 @@ public class InspirationActivityPost extends AppCompatActivity {
 
             //Create new post if valid
             if(validPost) {
-                //Change here
                 String uid = (Objects.requireNonNull(mAuth.getCurrentUser())).getUid();
                 newPost = new Post(uid, title, caption, image, selectedTags,0);
-                Log.i("InspirationActivityPost", "PostInfo: " + newPost);
+                //Log.i("InspirationActivityPost", "PostInfo: " + newPost);
 
                 Map<String, Object> post = new HashMap<>();
                 post.put("uid", newPost.getUid());
@@ -276,13 +286,13 @@ public class InspirationActivityPost extends AppCompatActivity {
                                     .collection("your_posts")
                                     .add(savedData)
                                     .addOnSuccessListener(docRef -> {
-                                        Log.i("Firebase", "Post successfully added to user's posts!");
+                                        //Log.i("Firebase", "Post successfully added to user's posts!");
                                         Snackbar.make(findViewById(android.R.id.content).getRootView(),
                                                 "Post created!", 3000).show();
                                         finish();
                                     })
                                     .addOnFailureListener(e -> {
-                                        Log.e("Firebase", "Error adding post to user's posts", e);
+                                        //Log.e("Firebase", "Error adding post to user's posts", e);
                                     });
 
                             //Store copy of post image
@@ -291,7 +301,7 @@ public class InspirationActivityPost extends AppCompatActivity {
                                     .child("post_images")
                                     .child(uid)
                                     .child(dRef.getId() + ".jpg");
-                            Log.i("Firebase", "dref Id: " + dRef.getId());
+                            //Log.i("Firebase", "dref Id: " + dRef.getId());
 
                             // Download to temp file
                             try {
@@ -311,32 +321,35 @@ public class InspirationActivityPost extends AppCompatActivity {
                                                         .addOnSuccessListener(uri -> {
                                                             dRef.update("imageUrl", String.valueOf(Uri.parse(uri.toString())))
                                                                     .addOnSuccessListener(v -> {
-                                                                        Log.i("Firebase", "Changed post url field to copy");
+                                                                        //Log.i("Firebase", "Changed post url field to copy");
                                                                     })
                                                                     .addOnFailureListener(e -> {
-                                                                        Log.e("Firebase", "Error changing post url field to copy", e);
+                                                                        //Log.e("Firebase", "Error changing post url field to copy", e);
                                                                     });
-                                                            Log.i("Firebase", "Post image copy made");
+                                                            //Log.i("Firebase", "Post image copy made");
                                                         }))
                                                 .addOnFailureListener(e -> {
-                                                    Log.e("Firebase", "Error making post image copy", e);
+                                                    //Log.e("Firebase", "Error making post image copy", e);
                                                 });
                                     } catch (IOException e) {
-                                        Log.e("Firebase", "Error making post image copy, input stream", e);
+                                        //Log.e("Firebase", "Error making post image copy, input stream", e);
                                     }
                                 }).start();
                             } catch (IOException e) {
-                                Log.e("Firebase", "Error making post image copy, temp file", e);
+                                //Log.e("Firebase", "Error making post image copy, temp file", e);
                             }
                         })
                         .addOnFailureListener(e -> {
-                            Log.e("Firebase", "Error adding post to feed", e);
+                            //Log.e("Firebase", "Error adding post to feed", e);
                         });
 
             }
         }
     }
 
+    /**
+     * Removes the keyboard from the screen when the user clicks off of it.
+     */
     private void setupKeyboardDismissOnTouch(View rootView) {
         if (!(rootView instanceof EditText)) {
             rootView.setOnTouchListener((v, event) -> {
@@ -369,105 +382,3 @@ public class InspirationActivityPost extends AppCompatActivity {
     }
 
 }
-
-/*
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagCasual"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Casual"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagFormal"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Formal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagStreetwear"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Streetwear"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagSporty"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Sporty"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagVintage"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Vintage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagChic"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Chic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagBaggy"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Baggy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagRetro"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Retro"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagOldMoney"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Old Money"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tagBusinessCasual"
-                    style="@style/Widget.MaterialComponents.Chip.Filter"
-                    android:text="Business Casual"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:checkable="true"
-                    android:clickable="true"
-                    app:checkedIconVisible="true" />
- */

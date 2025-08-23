@@ -19,6 +19,10 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.Objects;
 
+/**
+ * InspirationActivityOutfitDetail displays a larger view of the user's selected post image when
+ * clicked on.
+ */
 public class InspirationActivityOutfitDetail extends AppCompatActivity {
 
     @Override

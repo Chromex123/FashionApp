@@ -16,6 +16,10 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.Objects;
 
+/**
+ * InspirationActivityPostDetail displays a more detailed view of the post the user clicked on,
+ * displaying a larger image and the post's description.
+ */
 public class InspirationActivityPostDetail extends AppCompatActivity {
 
     private ImageView postImage;
@@ -30,17 +34,16 @@ public class InspirationActivityPostDetail extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_inspiration_post_detail);
 
-
-        setUpViews();
-        getPostInfo();
-    }
-
-    private void setUpViews() {
         postImage = (ImageView) findViewById(R.id.selectedPostImage);
         postCaption = (TextView) findViewById(R.id.selectedPostCaption);
         postStyles = (FlexboxLayout) findViewById(R.id.selectedPostStyles);
+        getPostInfo();
     }
 
+    /**
+     * Gets the image, styles, and caption of the selected post from the news feed screen
+     * to display.
+     */
     private void getPostInfo() {
         Intent prevIntent = getIntent();
         int position = prevIntent.getIntExtra("position", 0);

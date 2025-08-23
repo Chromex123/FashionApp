@@ -2,13 +2,13 @@ package com.example.fashionapp;
 
 import androidx.annotation.NonNull;
 
-import com.google.firebase.firestore.FieldValue;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Post class contains the information associated with a post in the app.
+ */
 public class Post {
     private String docId;
     private String title;

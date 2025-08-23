@@ -54,6 +54,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * HomeFragment is the main app page. It uses Firebase to display all the images the user has uploaded onto the app.
+ * The user can press the plus button to upload images, and long pressing an image prompts the user
+ * to select images to delete.
+ */
 public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListener, RecycleAdapter.OnItemLongClickListener{
 
     private FirebaseAuth mAuth;
@@ -64,6 +69,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
     public static List<String> recyclingArrayList;
     RecycleAdapter recycleAdapter;
 
+    // Handles getting the image uri of the image the user selected from their device.
     private ActivityResultLauncher<Intent> launcher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -75,8 +81,6 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                                 if(!recyclingArrayList.contains(imageUri)) {
                                     selectedImageView.setImageURI(imageUri);
                                     saveImageToFirebase(imageUri);
-                                    //saveImageUrisToPreferences(recyclingArrayList);
-                                    //Snackbar.make(binding.getRoot(), "Image uploaded", 500).show();
                                 }else{
                                     Snackbar.make(binding.getRoot(), "Upload failed. Image already exists.", 1000).show();
                                 }
@@ -92,27 +96,18 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                              ViewGroup container, Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
 
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
-
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
         // Handling onClick Buttons
         ImageButton addPhotoButton = root.findViewById(R.id.addPhotoButton);
-
-        /// //////////////////////////////
-        //clearPreferences(); // To reset all images stored in preferences
-        /// /////////////////////////////
 
         //Set up grid view of images
         recyclingArrayList = new ArrayList<>();
         recycleAdapter = new RecycleAdapter(requireContext().getApplicationContext(), recyclingArrayList, this, this);
         setUpRecycler(root);
-        Log.i("HomeFragment","Recycler Setup");
+        //Log.i("HomeFragment","Recycler Setup");
 
         View inflatedView = getLayoutInflater().inflate(R.layout.recycle_cell, null);
         selectedImageView = inflatedView.findViewById(R.id.photo_1);
@@ -134,7 +129,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                     loadGalleryImages();
                 })
                 .addOnFailureListener(e -> {
-                    Log.i("Firebase", "Anonymous sign-in failed", e);
+                    //Log.i("Firebase", "Anonymous sign-in failed", e);
                 });
         }
         
@@ -170,7 +165,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                             saveImageUrlToFirestore(uri);
                             recyclingArrayList.add(String.valueOf(Uri.parse(uri.toString())));
                             recycleAdapter.notifyDataSetChanged();
-                            Log.i("HomeFragment","Image added");
+                            //Log.i("HomeFragment","Image added");
                         }))
                 .addOnFailureListener(e -> {
                     Snackbar.make(binding.getRoot(), "Upload failed", 500).show();
@@ -180,7 +175,7 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
     private void saveImageUrlToFirestore(Uri imageUri) {
         String imageUrl = String.valueOf(Uri.parse(imageUri.toString()));
         String uid = (Objects.requireNonNull(mAuth.getCurrentUser())).getUid();
-        Log.i("Firebase", "Saved to firebase");
+        //Log.i("Firebase", "Saved to firebase");
 
         Map<String, Object> newImage = new HashMap<>();
         newImage.put("imageUrl", imageUrl);
@@ -192,16 +187,19 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                 .collection("images")
                 .add(newImage)
                 .addOnSuccessListener(documentReference -> {
-                    Log.i("Firebase", "Url saved to firestore");
+                    //Log.i("Firebase", "Url saved to firestore");
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e("Firebase", "Error uploading image to firestore", e);
+                        //Log.e("Firebase", "Error uploading image to firestore", e);
                     }
                 });
     }
 
+    /**
+     * Load the images the user has uploaded from Firestore.
+     */
     private void loadGalleryImages() {
         String uid = (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser())).getUid();
 
@@ -216,12 +214,12 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                     for (DocumentSnapshot doc : querySnapshot) {
                         String imageUrl = doc.getString("imageUrl");
                         recyclingArrayList.add(imageUrl);
-                        Log.i("Firebase", "Image loaded");
+                        //Log.i("Firebase", "Image loaded");
                     }
                     recycleAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
-                    Log.i("Firebase", Objects.requireNonNull(e.getMessage()));
+                    //Log.i("Firebase", Objects.requireNonNull(e.getMessage()));
                 });
     }
 
@@ -240,52 +238,58 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         // Delete the document
                         doc.getReference().delete()
-                            .addOnSuccessListener(aVoid -> Log.i("Firebase", "Deleted from Firestore"))
-                            .addOnFailureListener(e -> Log.e("Firebase", "Delete failed: " + e.getMessage()));
+                            .addOnSuccessListener(aVoid -> {
+                                //Log.i("Firebase", "Deleted from Firestore");
+                            })
+                            .addOnFailureListener(e -> {
+                                //Log.e("Firebase", "Delete failed: ", e);
+                            });
                     }
                 })
-                .addOnFailureListener(e -> Log.e("Firebase", "Query failed: " + e.getMessage()));
+                .addOnFailureListener(e -> {
+                    //Log.e("Firebase", "Query failed: " + e.getMessage())
+                });
 
+            //Delete from firebase storage
             FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
                 .delete()
-                .addOnSuccessListener(aVoid -> Log.i("Storage", "Deleted from Firebase"))
-                .addOnFailureListener(e -> Log.e("Storage", "Storage delete failed: " + e.getMessage()));
+                .addOnSuccessListener(aVoid -> {
+                    //Log.i("Firebase", "Deleted from Firebase"))
+                })
+                .addOnFailureListener(ex -> {
+                    //Log.e("Firebase", "Storage delete failed: ", e)
+                });
         }
     }
 
-    private void saveImageUrisToPreferences(List<Uri> imageUris) {
-        SharedPreferences prefs = requireContext().getApplicationContext().getSharedPreferences("gallery_prefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        // Convert each Uri to string
-        Set<String> uriStrings = new HashSet<>();
-        for (Uri uri : imageUris) {
-            uriStrings.add(uri.toString());
-        }
-
-        editor.putStringSet("saved_uris", uriStrings);
-        editor.commit();
-    }
-
+    /**
+     * Launches the intent that allows the user to select device files to upload to the app.
+     */
     private void onAddPhotoButtonClick(View clicked, View view) {
-        Log.i("HomeFragment","Button click");
+        //Log.i("HomeFragment","Button click");
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
         launcher.launch(intent);
-        //saveImageUrisToPreferencesTest();
     }
 
+    /**
+     * Shows a larger view of the image the user clicked on in the user's uploaded images screen
+     */
     @Override
     public void onItemClick(int position) {
         Intent detailIntent = new Intent(requireContext().getApplicationContext(), HomeActivityDetail.class);
         detailIntent.putExtra("position", position);
         startActivity(detailIntent);
-        Log.i("HomeFragment", "Item Click Activity Started, Clicked image at " + position);
+        //Log.i("HomeFragment", "Item Click Activity Started, Clicked image at " + position);
     }
 
+    /**
+     * Enters multi-select mode when the user long presses an image, allowing the user to select multiple
+     * images to delete.
+     */
     @Override
     public void onItemLongClick() {
-        Log.i("HomeFragment", "Multi-Select Mode");
+        //Log.i("HomeFragment", "Multi-Select Mode");
         this.isInSelectionMode = true;
         showBottomActionBar();
         toggleAddPhotoButton(false);
@@ -310,20 +314,20 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
                 return;
             }
 
-            new AlertDialog.Builder(requireContext())
+            new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialogTheme)
                 .setTitle("Delete selected images?")
                 .setMessage("This action cannot be undone.")
                 .setPositiveButton("Delete", (dialog, which) -> {
 
                     // 1. Remove selected images from imageUris
                     recyclingArrayList.removeAll(selectedUris);
-                    Log.i("HomeFragment", selectedUris.size() + " images deleted");
+                    //Log.i("HomeFragment", selectedUris.size() + " images deleted");
 
                     // 2. Delete selected images from firestore
                     try {
                         deleteImagesFromFirebase(selectedUris);
                     } catch (Exception e) {
-                        Log.e("HomeFragment", "Error deleting images");
+                        //Log.e("HomeFragment", "Error deleting images");
                         Snackbar.make(binding.getRoot(), "Could not delete image(s). Try again.", 1000).show();
                     }
 
@@ -363,6 +367,9 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
         });
     }
 
+    /**
+     * Shows the action bar containing the delete button.
+     */
     private void showBottomActionBar() {
         View bar = binding.getRoot().findViewById(R.id.bottom_action_bar);
         if (bar.getVisibility() != View.VISIBLE) {
@@ -395,70 +402,4 @@ public class HomeFragment extends Fragment implements RecycleAdapter.OnItemListe
             actionBar.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
-
-    /*
-     ********************
-     ********************
-     * Currently unused *
-
-    private List<Uri> loadPostsFromFirestore() {
-        List<Uri> images = new ArrayList<>();
-        FirebaseFirestore.getInstance().collection("user_gallery")
-                .whereEqualTo("uid", (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser())).getUid())
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        images.add(doc.toObject(Uri.class));
-                    }
-                });
-        Log.i("HomeFragment","Current uris: " + images);
-        return images;
-    }
-
-    private List<Uri> loadImageUrisFromPreferences() {
-        SharedPreferences prefs = requireContext().getApplicationContext().getSharedPreferences("gallery_prefs", Context.MODE_PRIVATE);
-        Set<String> uriStrings = prefs.getStringSet("saved_uris", new HashSet<>());
-        List<Uri> uris = new ArrayList<>();
-
-        for (String uriStr : uriStrings) {
-            uris.add(Uri.parse(uriStr));
-        }
-        Log.i("HomeFragment","Current uris: " + uris);
-
-        return uris;
-    }
-
-    // To test saving/loading from images in drawable folder
-    private void saveImageUrisToPreferencesTest() {
-        SharedPreferences prefs = requireContext().getApplicationContext().getSharedPreferences("gallery_prefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        List<Uri> imageUris = new ArrayList<>();
-
-        imageUris.add(Uri.parse("android.resource://"+requireContext().getApplicationContext().getPackageName() + "/" + R.drawable.ic_home_add));
-        imageUris.add(Uri.parse("android.resource://"+requireContext().getApplicationContext().getPackageName() + "/" + R.drawable.ic_menu_about));
-        imageUris.add(Uri.parse("android.resource://"+requireContext().getApplicationContext().getPackageName() + "/" + R.drawable.ic_menu_home));
-
-        // Convert each Uri to string
-        Set<String> uriStrings = new HashSet<>();
-        for (Uri uri : imageUris) {
-            uriStrings.add(uri.toString());
-            selectedImageView.setImageURI(uri);
-            recyclingArrayList.add(uri);
-            recycleAdapter.notifyDataSetChanged();
-        }
-
-        editor.putStringSet("saved_uris", uriStrings);
-        editor.commit();
-        Log.i("HomeFragment","Saved Test");
-    }
-
-    private void clearPreferences() {
-        SharedPreferences prefs = requireContext().getApplicationContext().getSharedPreferences("gallery_prefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove("saved_uris");
-        editor.commit();
-    }
-    */
 }

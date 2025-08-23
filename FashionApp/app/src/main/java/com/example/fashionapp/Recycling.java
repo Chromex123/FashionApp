@@ -1,5 +1,8 @@
 package com.example.fashionapp;
 
+/**
+ * Recycling class contains the information associated with an item in a recycler view.
+ */
 public class Recycling {
     private String id;
     private String name;

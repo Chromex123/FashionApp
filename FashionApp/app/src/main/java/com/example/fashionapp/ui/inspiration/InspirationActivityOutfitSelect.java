@@ -1,17 +1,10 @@
 package com.example.fashionapp.ui.inspiration;
 
-import static java.sql.DriverManager.println;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * InspirationActivityOutfitSelect displays all the user's uploaded images and allows the user to
+ * select one image to use as their post's image.
+ */
 public class InspirationActivityOutfitSelect extends AppCompatActivity {
 
     FirebaseAuth mAuth;
@@ -49,7 +46,7 @@ public class InspirationActivityOutfitSelect extends AppCompatActivity {
                 }else{
                     resultIntent.putExtra("selectedImageUrl", imageUrls.get(selectedImageUrlPosition));
                 }
-                Log.i("InspirationActivityOutfitSelect","Selected position: " + selectedImageUrlPosition);
+                //Log.i("InspirationActivityOutfitSelect","Selected position: " + selectedImageUrlPosition);
                 setResult(RESULT_OK, resultIntent);
                 finish();
             }
@@ -77,12 +74,12 @@ public class InspirationActivityOutfitSelect extends AppCompatActivity {
                     for (DocumentSnapshot doc : querySnapshot) {
                         String url = doc.getString("imageUrl");
                         imageUrls.add(url);
-                        Log.i("Firebase", "Image loaded");
+                        //Log.i("Firebase", "Image loaded");
                     }
                     outfitAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
-                    Log.i("Firebase", Objects.requireNonNull(e.getMessage()));
+                    //Log.i("Firebase", Objects.requireNonNull(e.getMessage()));
                 });
     }
 }

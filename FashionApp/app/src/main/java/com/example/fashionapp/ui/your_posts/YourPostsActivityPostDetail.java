@@ -20,6 +20,10 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.Objects;
 
+/**
+ * YourPostsActivityPostDetail displays a more detailed view of the post the user clicked on,
+ * displaying a larger image and the post's description.
+ */
 public class YourPostsActivityPostDetail extends AppCompatActivity {
     private ImageView postImage;
     private TextView postCaption;
@@ -29,18 +33,13 @@ public class YourPostsActivityPostDetail extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_your_posts_post_detail);
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        setUpViews();
-        getPostInfo();
-    }
-
-    private void setUpViews() {
         postImage = (ImageView) findViewById(R.id.selectedPostImage);
         postCaption = (TextView) findViewById(R.id.selectedPostCaption);
         postStyles = (FlexboxLayout) findViewById(R.id.selectedPostStyles);
+        getPostInfo();
     }
 
     private void getPostInfo() {

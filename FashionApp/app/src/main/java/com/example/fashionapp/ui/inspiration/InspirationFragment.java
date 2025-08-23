@@ -1,15 +1,11 @@
 package com.example.fashionapp.ui.inspiration;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-import static java.lang.Math.toIntExact;
-import static java.util.Map.entry;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,12 +18,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -35,9 +29,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.fashionapp.Post;
 import com.example.fashionapp.PostAdapter;
 import com.example.fashionapp.R;
-import com.example.fashionapp.RecycleAdapter;
 import com.example.fashionapp.databinding.FragmentInspirationBinding;
-import com.example.fashionapp.ui.home.HomeActivityDetail;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,6 +44,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * InspirationFragment displays a feed of posts from all users, allowing
+ * filtering by tags, sorting by newest or most upvotes, searching by title, and refreshing to load new content.
+ */
 public class InspirationFragment extends Fragment implements PostAdapter.OnImageSelectedListener {
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
@@ -71,15 +67,12 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
     private final String[] orderByOptionsList = {"timestamp", "voteCount"}; // Firebase fields to order posts by
     private List<String> selectedStyles = new ArrayList<String>();
     private final String[] allTags = InspirationActivityPost.styles;
-    private boolean[] selectedTags = new boolean[allTags.length];
+    private boolean[] selectedTags = new boolean[allTags.length]; // For filter by styles alert dialog
     private String currentOrderBy = "timestamp"; //default post order
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
-
-        InspirationViewModel inspirationViewModel =
-                new ViewModelProvider(this).get(InspirationViewModel.class);
 
         binding = FragmentInspirationBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -105,7 +98,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
         swipeRefreshPosts.setOnRefreshListener(() -> {
             // Reload your posts here
             loadPosts();
-            Log.i("InspirationFragment","Posts reloaded");
+            //Log.i("InspirationFragment","Posts reloaded");
         });
 
         ImageButton newPostButton = root.findViewById(R.id.newPostButton);
@@ -117,6 +110,25 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
         });
 
         SearchView searchView = root.findViewById(R.id.search_bar);
+        int id = searchView.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        TextView searchTextView = (TextView) searchView.findViewById(id);
+        searchTextView.setHintTextColor(Color.WHITE);
+        searchTextView.setTextColor(Color.WHITE);
+
+        id = searchView.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_close_btn", null, null);
+        ImageView searchClose = searchView.findViewById(id);
+        searchClose.setColorFilter(requireContext().getApplicationContext().getResources().getColor(R.color.light_gray, null));
+
+        id = searchView.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_mag_icon", null, null);
+        ImageView searchImageView = (ImageView) searchView.findViewById(id);
+        searchImageView.setColorFilter(Color.WHITE);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -130,7 +142,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                 if(newText.isEmpty()) {
                     recyclerView.setAdapter(postAdapter);
                     isQueryActive = false;
-                    Log.i("InspirationFragment","Adapter using posts list");
+                    //Log.i("InspirationFragment","Adapter using posts list");
                 }
                 return true;
             }
@@ -149,7 +161,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                 queryText.append(text);
                 isQueryActive = true;
 
-                Log.i("InspirationFragment","Adapter using queried list, queried for: " + queryText.toString());
+                //Log.i("InspirationFragment","Adapter using queried list, queried for: " + queryText.toString());
             }
         });
 
@@ -158,7 +170,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
             //searchView.setIconified(true);
             recyclerView.setAdapter(postAdapter);
             isQueryActive = false;
-            Log.i("InspirationFragment","Adapter using posts list");
+            //Log.i("InspirationFragment","Adapter using posts list");
             return false;
         });
 
@@ -220,7 +232,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                         loadPosts();
                     })
                     .addOnFailureListener(e -> {
-                        Log.e("Firebase", "Anonymous sign-in failed", e);
+                        //Log.e("Firebase", "Anonymous sign-in failed", e);
                     });
         }
 
@@ -281,12 +293,12 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                         postAdapter.notifyDataSetChanged();
                     }
                     swipeRefreshPosts.setRefreshing(false);
-                    Log.i("InspirationFragment","Order By: " + currentOrderBy);
-                    Log.i("InspirationFragment", "Filter: " + selectedStyles.toString());
+                    //Log.i("InspirationFragment","Order By: " + currentOrderBy);
+                    //Log.i("InspirationFragment", "Filter: " + selectedStyles.toString());
                 })
                 .addOnFailureListener(e -> {
                     swipeRefreshPosts.setRefreshing(false);
-                    Log.e("InspirationFragment", Objects.requireNonNull(e.getMessage()));
+                    //Log.e("InspirationFragment", Objects.requireNonNull(e.getMessage()));
                     Snackbar.make(binding.getRoot(), "Error loading posts", 1000).show();
                 });
     }
@@ -299,7 +311,7 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
     }
 
     private void onNewPostButtonClick(View clicked, View view) {
-        Log.i("InspirationFragment","Button click");
+        //Log.i("InspirationFragment","Button click");
         ((ImageButton) clicked).setEnabled(false);
         Intent newPostIntent = new Intent(requireContext().getApplicationContext(), InspirationActivityPost.class);
         startActivity(newPostIntent);
@@ -354,11 +366,14 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
         Intent detailIntent = new Intent(requireContext().getApplicationContext(), InspirationActivityPostDetail.class);
         detailIntent.putExtra("position", position);
         startActivity(detailIntent);
-        Log.i("InspirationFragment", "Post Select Activity Started");
+        //Log.i("InspirationFragment", "Post Select Activity Started");
     }
 
+    /**
+     * Shows the alert dialog pop-up that allows the user to select multiple styles to filter posts by.
+     */
     private void showTagFilterDialog() {
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(getContext(), R.style.CustomAlertDialogTheme)
                 .setTitle("Select Styles")
                 .setMultiChoiceItems(allTags, selectedTags, (dialog, which, isChecked) -> {
                     selectedTags[which] = isChecked;
@@ -376,6 +391,9 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
                 .show();
     }
 
+    /**
+     * If no styles are selected, load the unfiltered post feed, otherwise filter the feed.
+     */
     private void filterPostsByTags() {
         if (selectedStyles.isEmpty()) {
             // Load all posts if no tags selected
@@ -441,13 +459,13 @@ public class InspirationFragment extends Fragment implements PostAdapter.OnImage
 
                     TextView stylesText = binding.getRoot().findViewById(R.id.filter_feed_text);
                     stylesText.setTextColor(requireContext().getApplicationContext().getResources().getColor(R.color.teal_700, null));
-                    Log.i("InspirationFragment","Order By: " + currentOrderBy);
-                    Log.i("InspirationFragment", "Filter: " + selectedStyles.toString());
+                    //Log.i("InspirationFragment","Order By: " + currentOrderBy);
+                    //Log.i("InspirationFragment", "Filter: " + selectedStyles.toString());
                 })
                 .addOnFailureListener(e -> {
                     swipeRefreshPosts.setRefreshing(false);
 
-                    Log.e("InspirationFragment", Objects.requireNonNull(e.getMessage()));
+                    //Log.e("InspirationFragment", Objects.requireNonNull(e.getMessage()));
                     Snackbar.make(binding.getRoot(), "Error loading posts", 1000).show();
                 });
     }

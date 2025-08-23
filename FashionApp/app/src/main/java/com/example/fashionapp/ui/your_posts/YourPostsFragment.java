@@ -30,12 +30,17 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * YourPostsFragment displays all posts created by the current user. Users can also delete their
+ * posts here.
+ */
 public class YourPostsFragment extends Fragment implements YourPostAdapter.OnImageSelectedListener, YourPostAdapter.OnDeleteButtonListener {
 
     private FragmentYourPostsBinding binding;
@@ -66,10 +71,10 @@ public class YourPostsFragment extends Fragment implements YourPostAdapter.OnIma
             mAuth.signInAnonymously()
                     .addOnSuccessListener(authResult -> {
                         loadYourPosts();
-                        Log.i("YourPostsFragment", "Saved posts loaded");
+                        //Log.i("YourPostsFragment", "Saved posts loaded");
                     })
                     .addOnFailureListener(e -> {
-                        Log.e("Firebase", "Anonymous sign-in failed", e);
+                        //Log.e("Firebase", "Anonymous sign-in failed", e);
                     });
         }
 
@@ -116,28 +121,29 @@ public class YourPostsFragment extends Fragment implements YourPostAdapter.OnIma
                                         postAdapter.notifyItemInserted(yourPostsList.size()-1);
                                     }
                                 }else{
+                                    // If document reference does not exist, delete it
                                     FirebaseFirestore.getInstance().collection("user_gallery")
                                             .document(uid)
                                             .collection("your_posts")
                                             .document(doc.getId())
                                             .delete()
                                             .addOnSuccessListener(aVoid -> {
-                                                Log.i("YourPostsFragment", "PostRef deleted in user's posts");
+                                                //Log.i("YourPostsFragment", "PostRef deleted in user's posts");
                                             })
                                             .addOnFailureListener(e -> {
-                                                Log.e("YourPostsFragment", "Could not delete PostRef", e);
+                                                //Log.e("YourPostsFragment", "Could not delete PostRef", e);
                                             });
                                 }
                             }).addOnFailureListener(e -> {
-                                Log.e("YourPostsFragment", "Error loading post", e);
+                                //Log.e("YourPostsFragment", "Error loading post", e);
                                 Snackbar.make(binding.getRoot(), "Error loading a post", 1000).show();
                             });
                         }
                     }
-                    Log.i("YourPostsFragment","User's posts loaded");
+                    //Log.i("YourPostsFragment","User's posts loaded");
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("YourPostsFragment", "Error loading saved posts", e);
+                    //Log.e("YourPostsFragment", "Error loading saved posts", e);
                     Snackbar.make(binding.getRoot(), "Error loading saved posts", 1000).show();
                 });
     }
@@ -154,7 +160,7 @@ public class YourPostsFragment extends Fragment implements YourPostAdapter.OnIma
         Intent detailIntent = new Intent(requireContext().getApplicationContext(), YourPostsActivityPostDetail.class);
         detailIntent.putExtra("position", position);
         startActivity(detailIntent);
-        Log.i("YourPostsFragment", "Saved Post Detail Activity Started");
+        //Log.i("YourPostsFragment", "Saved Post Detail Activity Started");
     }
 
     @Override
@@ -163,10 +169,14 @@ public class YourPostsFragment extends Fragment implements YourPostAdapter.OnIma
         binding = null;
     }
 
+    /**
+     * Displays an alert dialog pop-up prompting the user to either delete their selected post or
+     * cancel.
+     */
     @Override
     public void onDeleteButtonClick(int position) {
         Post post = yourPostsList.get(position);
-        new AlertDialog.Builder(requireContext())
+        new AlertDialog.Builder(requireContext(), R.style.CustomAlertDialogTheme)
                 .setTitle("Delete Post")
                 .setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("DELETE", (dialog, which) -> {
@@ -176,14 +186,22 @@ public class YourPostsFragment extends Fragment implements YourPostAdapter.OnIma
                             .document(post.getDocId())
                             .delete()
                             .addOnSuccessListener(aVoid -> {
-                                //Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
-                                Log.i("YourPostsFragment", "success");
-                                // Remove from local list + update adapter
+                                FirebaseStorage.getInstance().getReferenceFromUrl(post.getImageUrl())
+                                        .delete()
+                                        .addOnSuccessListener(v -> {
+                                            //Log.i("Firebase", "Deleted image copy from Firebase"));
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            //Log.e("Storage", "Delete failed: ", e));
+                                        });
+                                // Remove from local list and update adapter
                                 yourPostsList.remove(position);
                                 postAdapter.notifyItemRemoved(position);
+
+                                //Log.i("YourPostsFragment", "Delete success");
                             })
                             .addOnFailureListener(e -> {
-                                Log.i("YourPostsFragment", "fail");
+                                //Log.i("YourPostsFragment", "Delete fail");
                                 //Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show();
                             });
                 })

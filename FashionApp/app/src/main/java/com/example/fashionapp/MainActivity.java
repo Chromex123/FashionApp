@@ -27,6 +27,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * MainActivity serves as the primary entry point of the app, hosting the
+ * navigation drawer and managing fragments for each section of the app.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -48,16 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.appBarMain.toolbar);
 
-        /*
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .setAnchorView(R.id.fab).show();
-                Log.i("MainActivity","Button clicked");
-            }
-        }); */
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
@@ -100,12 +94,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d("Firebase", "signInAnonymously:success");
+                            //Log.d("Firebase", "signInAnonymously:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("Firebase", "signInAnonymously:failure", task.getException());
+                            //Log.w("Firebase", "signInAnonymously:failure", task.getException());
                             Toast.makeText(MainActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
@@ -116,9 +110,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateUI(FirebaseUser u) {
         if(u == null) {
-            Log.i("Firebase", "user null");
+            //Log.i("Firebase", "user null");
         }else{
-            Log.i("Firebase", "ui updated" + u.getDisplayName());
+            //Log.i("Firebase", "ui updated" + u.getDisplayName());
         }
     }
 

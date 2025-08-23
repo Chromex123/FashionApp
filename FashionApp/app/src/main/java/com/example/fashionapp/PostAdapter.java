@@ -31,6 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * PostAdapter binds post data to the RecyclerView
+ * in the news feed and the user's saved posts screen. Handles displaying post images, captions, tags,
+ * and any associated actions such as saving and voting.
+ */
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
     private List<Post> postList;
     Context context;
@@ -113,7 +118,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 })
                 .addOnFailureListener(e -> {
                     //Snackbar.make(holder.itemView, "Failed to unsave post", 1000).show();
-                    Log.e("InspirationFragment","Failed to retrieve post", e);
+                    //Log.e("InspirationFragment","Failed to retrieve post", e);
                 });
 
         holder.upvoteButton.setOnClickListener(v -> {
@@ -150,12 +155,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                     postRef.delete()
                             .addOnSuccessListener(aVoid -> {
                                 //Snackbar.make(holder.itemView, "Post unsaved", 1000).show();
-                                Log.i("InspirationFragment","Post unsaved");
+                                //Log.i("InspirationFragment","Post unsaved");
                                 holder.saveButton.setColorFilter(Color.WHITE);
                             })
                             .addOnFailureListener(e -> {
                                 //Snackbar.make(holder.itemView, "Failed to unsave post", 1000).show();
-                                Log.e("InspirationFragment","Failed to unsave post", e);
+                                //Log.e("InspirationFragment","Failed to unsave post", e);
                             });
                 } else {
                     //If Post not saved then save it
@@ -165,12 +170,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
                     postRef.set(savedData)
                             .addOnSuccessListener(aVoid -> {
-                                Log.i("InspirationFragment","Post saved success");
+                                //Log.i("InspirationFragment","Post saved success");
                                 holder.saveButton.setColorFilter(Color.YELLOW);
                             })
                             .addOnFailureListener(e -> {
                                 //Snackbar.make(holder.itemView, "Failed to save post", 1000).show();
-                                Log.e("InspirationFragment","Failed to save post", e);
+                                //Log.e("InspirationFragment","Failed to save post", e);
                             });
                 }
             });
@@ -273,9 +278,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             return null;
         }).addOnSuccessListener(aVoid -> {
             notifyItemChanged(holder.getBindingAdapterPosition());
-            Log.i("InspirationFragment", "Vote updated successfully");
+            //Log.i("InspirationFragment", "Vote updated successfully");
         }).addOnFailureListener(e -> {
-            Log.e("InspirationFragment", "Failed to update vote", e);
+            //Log.e("InspirationFragment", "Failed to update vote", e);
         });
     }
 
