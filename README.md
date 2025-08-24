@@ -1,4 +1,8 @@
 # Fashionly App
+Created by: Chukwuemeka Nsolo <br>
+Contact: emekansolo@gmail.com <br>
+Purpose: This app is designed to inspire fashion creativity by letting anonymous users share, discover, and save unique outfit ideas. <br>
+
 ## Screenshots
 <img src="https://github.com/user-attachments/assets/9b299acb-c9fb-41db-bc86-feeda0069f71" height="350">
 <img src="https://github.com/user-attachments/assets/4dd6f538-6858-464e-b6c4-529bf59d9e6e" height="350">
