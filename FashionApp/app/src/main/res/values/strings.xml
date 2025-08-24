@@ -17,6 +17,8 @@
 
     <!-- AboutFragment -->
     <string name="about_purpose">This app is designed to inspire fashion creativity by letting
-        users anonymously share, discover, and save unique outfit ideas.</string>
+        users anonymously share, discover, and save unique outfit ideas.
+        For questions reach me at: chromx.developer@gmail.com
+    </string>
 
 </resources>
