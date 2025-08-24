@@ -1,4 +1,13 @@
 # Fashionly App
+## Screenshots
+![Screenshot_2025-08-23-14-22-40-17_fc321b1f1ec77cbf42cf2e7c482a3859](https://github.com/user-attachments/assets/9b299acb-c9fb-41db-bc86-feeda0069f71)
+![Screenshot_2025-08-23-14-27-37-45_fc321b1f1ec77cbf42cf2e7c482a3859](https://github.com/user-attachments/assets/4dd6f538-6858-464e-b6c4-529bf59d9e6e)
+![Screenshot_2025-08-23-14-45-51-42_fc321b1f1ec77cbf42cf2e7c482a3859](https://github.com/user-attachments/assets/c3bba4cf-ef8a-4605-a5c0-aef2b7bd6496)
+![Screenshot_2025-08-23-14-46-35-72_fc321b1f1ec77cbf42cf2e7c482a3859](https://github.com/user-attachments/assets/44493d09-5c1d-46c5-992c-55ad03a68d36)
+![Screenshot_2025-08-23-14-49-21-70_fc321b1f1ec77cbf42cf2e7c482a3859](https://github.com/user-attachments/assets/3110359c-9998-4d40-b872-38abb0456067)
+
+---
+
 ## Overview
 An Android fashion inspiration app that allows users to:
 - Upload their favorite outfits and post them instantly
@@ -26,9 +35,5 @@ Everything’s anonymous, so it’s all about the **fashion**, not the follower 
 - **Framework**: Android (Fragments, RecyclerView, ConstraintLayout, FlexboxLayout)
 - **Backend**: Firebase Firestore, Firebase Cloud Storage, Firebase Authentication
 - **Other Tools**: Firebase Cloud Functions, Glide (image loading)  
-
----
-
-## Screenshots *(optional)*
 
 ---
