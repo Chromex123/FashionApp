@@ -1,10 +1,10 @@
 # Fashionly App
 ## Screenshots
-<img src="https://github.com/user-attachments/assets/9b299acb-c9fb-41db-bc86-feeda0069f71" height="400">
-<img src="https://github.com/user-attachments/assets/4dd6f538-6858-464e-b6c4-529bf59d9e6e" height="400">
-<img src="https://github.com/user-attachments/assets/c3bba4cf-ef8a-4605-a5c0-aef2b7bd6496" height="400">
-<img src="https://github.com/user-attachments/assets/44493d09-5c1d-46c5-992c-55ad03a68d36" height="400">
-<img src="https://github.com/user-attachments/assets/3110359c-9998-4d40-b872-38abb0456067" height="400">
+<img src="https://github.com/user-attachments/assets/9b299acb-c9fb-41db-bc86-feeda0069f71" height="350">
+<img src="https://github.com/user-attachments/assets/4dd6f538-6858-464e-b6c4-529bf59d9e6e" height="350">
+<img src="https://github.com/user-attachments/assets/c3bba4cf-ef8a-4605-a5c0-aef2b7bd6496" height="350">
+<img src="https://github.com/user-attachments/assets/44493d09-5c1d-46c5-992c-55ad03a68d36" height="350">
+<img src="https://github.com/user-attachments/assets/3110359c-9998-4d40-b872-38abb0456067" height="350">
 
 ---
 
