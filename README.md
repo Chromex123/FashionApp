@@ -1,7 +1,7 @@
 # Fashionly - Anonymous Fashion & Outfit Inspiration App
 Created by: Chukwuemeka Nsolo <br>
 Contact: emekansolo@gmail.com <br>
-Purpose: This app is designed to inspire fashion creativity by allowing users to share fits, explore fashion trends, and discover unique styles without the need for likes, followers, or public profiles. <br>
+Purpose: This app is designed to inspire fashion creativity by allowing users to share fits, explore fashion trends, and discover unique styles without the need for followers or public profiles. <br>
 
 ## Screenshots
 <img src="https://github.com/user-attachments/assets/9b299acb-c9fb-41db-bc86-feeda0069f71" height="350">
