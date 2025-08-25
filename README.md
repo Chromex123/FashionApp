@@ -2,6 +2,9 @@
 Created by: Chukwuemeka Nsolo <br>
 Contact: emekansolo@gmail.com <br>
 Purpose: This app is designed to inspire fashion creativity by allowing users to share fits, explore fashion trends, and discover unique styles without the need for followers or public profiles. <br>
+** Still in the Google Play Testing phase, has not been published on the Google Play Store yet**
+
+---
 
 ## Screenshots
 <img src="https://github.com/user-attachments/assets/9b299acb-c9fb-41db-bc86-feeda0069f71" height="350">
