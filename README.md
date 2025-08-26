@@ -2,7 +2,7 @@
 Created by: Chukwuemeka Nsolo <br>
 Contact: emekansolo@gmail.com <br>
 Purpose: This app is designed to inspire fashion creativity by allowing users to share fits, explore fashion trends, and discover unique styles without the need for followers or public profiles. <br>
-App Showcase Video Link: https://www.youtube.com/watch?v=zbilU0eN1F0&ab_channel=Emeka <br>
+App Showcase Video Link: https://youtu.be/zbilU0eN1F0?feature=shared <br>
 ## *Still in the Google Play Testing phase, has not been published on the Google Play Store yet*
 
 ---
